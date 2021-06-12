@@ -5,7 +5,9 @@ add_library(
         native-lib
         SHARED
 
-        native-lib.cpp)
+        native-lib.cpp
+        egl/TXEglHelp.cpp
+        )
 
 
 target_link_libraries(
