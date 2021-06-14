@@ -7,6 +7,7 @@ add_library(
 
         native-lib.cpp
         egl/TXEglHelp.cpp
+        egl/TXEglThread.cpp
         )
 
 

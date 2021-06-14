@@ -1,5 +1,7 @@
 package com.taxiao.opengl;
 
+import android.view.Surface;
+
 /**
  * jni 交互
  * Created by hanqq on 2021/6/12
@@ -17,4 +19,9 @@ public class JniSdkImpl {
      * which is packaged with this application.
      */
     public native String stringFromJNI();
+
+    public native void surfaceCreated(Surface surface);
+
+    public native void surfaceChanged(int width, int height);
+
 }

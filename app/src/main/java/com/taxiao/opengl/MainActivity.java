@@ -15,9 +15,9 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        TextView tv = findViewById(R.id.sample_text);
+        TXSurfaceView surface = findViewById(R.id.surface);
         JniSdkImpl jniSdk = new JniSdkImpl();
-        tv.setText(jniSdk.stringFromJNI());
+        surface.setJniSdkImpl(jniSdk);
     }
 
 
