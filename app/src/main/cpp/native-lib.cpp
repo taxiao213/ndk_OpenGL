@@ -2,11 +2,17 @@
 #include <string>
 #include "egl/TXEglHelp.h"
 #include "egl/TXEglThread.h"
+#include "shader/ShaderSource.h"
+#include "shader/ShaderUtil.h"
 
 JavaVM *jvm = NULL;
 ANativeWindow *mANativeWindow = NULL;
 TXEglHelp *mTxEglHelp = NULL;
 TXEglThread *mTXEglThread = NULL;
+int program;
+GLint avPosition;
+GLint afPosition;
+
 // 获取 jvm
 JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *javaVm, void *reserved) {
     jvm = javaVm;
@@ -50,6 +56,13 @@ Java_com_taxiao_opengl_JniSdkImpl_setSurface(JNIEnv *env, jobject thiz, jobject 
 void callBackSurfaceCreated(void *ctx) {
     SDK_LOG_D("callBackSurfaceCreated");
     TXEglThread *txEglThread = (TXEglThread *) ctx;
+
+    // TODO: 绘制三角形
+    program = createProgram(vertexSource, fragmentSource);
+    if (program > 0) {
+        avPosition = glGetAttribLocation(program, "av_Position");
+        afPosition = glGetUniformLocation(program, "af_Position");
+    }
 }
 
 // TODO: 回调函数 callBackSurfaceChanged
@@ -65,6 +78,16 @@ void callBackSurfaceDraw(void *ctx) {
     TXEglThread *txEglThread = (TXEglThread *) ctx;
     glClearColor(1.0f, 1.0f, 0.0f, 0.0f);
     glClear(GL_COLOR_BUFFER_BIT);
+
+    // TODO: 绘制三角形
+    if (program > 0) {
+        glUseProgram(program);
+        glEnableVertexAttribArray(avPosition);
+        glVertexAttribPointer(avPosition, 2, GL_FLOAT, false, 8, vertex);
+        glUniform4f(afPosition, 1.0f, 0.0f, 0.0f, 0.0f);
+        glDrawArrays(GL_TRIANGLES, 0, 3);
+        SDK_LOG_D("callBackSurfaceDraw 绘制三角形")
+    }
 }
 
 extern "C"

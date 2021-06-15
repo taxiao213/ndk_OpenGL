@@ -86,6 +86,7 @@ void TXEglThread::surfaceChanged(int width, int height) {
     this->isChange = true;
     this->surfaceWidth = width;
     this->surfaceHeight = height;
+    notifyThread();
 }
 
 void

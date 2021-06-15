@@ -30,8 +30,8 @@ public:
     bool isChange = false;
     bool isExit = false;
     bool isStart = false;
-    bool surfaceWidth = 0;
-    bool surfaceHeight = 0;
+    int surfaceWidth = 0;
+    int surfaceHeight = 0;
 
     // 回调函数 OnSurfaceCreated
     typedef void (*OnSurfaceCreated)(void *);
