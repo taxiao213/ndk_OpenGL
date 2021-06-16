@@ -70,3 +70,36 @@ static float textureData[] = {
         0, 0,
         1, 0
 };
+
+// ----------------矩阵----------------
+static const char *vertexMatrixSource = "attribute vec4 av_Position;\n"
+                                        "attribute vec2 af_Position;\n"
+                                        "varying vec2 v_texPosition;\n"
+                                        "uniform mat4 u_Matrix;\n"
+                                        "void main() {\n"
+                                        "    v_texPosition = af_Position;\n"
+                                        "    gl_Position = av_Position * u_Matrix;\n"
+                                        "}";
+
+static const char *fragmentMatrixSource = "precision mediump float;\n"
+                                          "varying vec2 v_texPosition;\n"
+                                          "uniform sampler2D s_texture;\n"
+                                          "void main() {\n"
+                                          "    gl_FragColor = texture2D(s_texture, v_texPosition);\n"
+                                          "}";
+// 绘制四边形
+static float vertexMatrixData[] = {
+        -1, -1,
+        1, -1,
+        -1, 1,
+        1, 1,
+};
+
+// 纹理坐标
+static float textureMatrixData[] = {
+        0, 1,
+        1, 1,
+        0, 0,
+        1, 0
+};
+
