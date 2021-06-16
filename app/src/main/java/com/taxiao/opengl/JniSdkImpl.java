@@ -24,4 +24,6 @@ public class JniSdkImpl {
 
     public native void surfaceChanged(int width, int height);
 
+    public native void onDrawImage(int width, int height, int size, byte[] bytes);
+
 }

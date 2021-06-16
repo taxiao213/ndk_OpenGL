@@ -12,6 +12,11 @@ TXEglThread *mTXEglThread = NULL;
 int program;
 GLint avPosition;
 GLint afPosition;
+GLint v_texPosition;
+GLuint textureid;
+void *image = NULL;
+int imageWidth;
+int imageHeight;
 
 // 获取 jvm
 JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *javaVm, void *reserved) {
@@ -58,10 +63,36 @@ void callBackSurfaceCreated(void *ctx) {
     TXEglThread *txEglThread = (TXEglThread *) ctx;
 
     // TODO: 绘制三角形
-    program = createProgram(vertexSource, fragmentSource);
+    // 1.创建渲染程序
+//    program = createProgram(vertexSource, fragmentSource);
+//    if (program > 0) {
+//        // 2.获取顶点坐标属性
+//        avPosition = glGetAttribLocation(program, "av_Position");
+//        afPosition = glGetUniformLocation(program, "af_Position");
+//    }
+
+    // TODO:绘制纹理
+    program = createProgram(vertexSource2, fragmentSource2);
     if (program > 0) {
+        // 2.获取顶点坐标和纹理坐标属性
         avPosition = glGetAttribLocation(program, "av_Position");
-        afPosition = glGetUniformLocation(program, "af_Position");
+        afPosition = glGetAttribLocation(program, "af_Position");
+        v_texPosition = glGetUniformLocation(program, "v_texPosition");
+        // 3.创建纹理
+        glGenTextures(1, &textureid);
+        // 4.绑定纹理
+        glBindTexture(GL_TEXTURE_2D, textureid);
+        // 5.设置环绕和过滤方式 环绕（超出纹理坐标范围）：（s==x t==y GL_REPEAT 重复）
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+        // 6.过滤（纹理像素映射到坐标点）：（缩小、放大：GL_LINEAR线性）边角无锯齿
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        // 7.绑定图片
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, imageWidth, imageHeight, 0, GL_RGBA,
+                     GL_UNSIGNED_BYTE, image);
+        // 解绑纹理
+        glBindTexture(GL_TEXTURE_2D, 0);
     }
 }
 
@@ -80,14 +111,40 @@ void callBackSurfaceDraw(void *ctx) {
     glClear(GL_COLOR_BUFFER_BIT);
 
     // TODO: 绘制三角形
+//    if (program > 0) {
+//        glUseProgram(program);
+//        glEnableVertexAttribArray(avPosition);
+//        glUniform4f(afPosition, 1.0f, 0.0f, 0.0f, 0.0f);
+//        SDK_LOG_D("callBackSurfaceDraw 绘制三角形");
+//        glVertexAttribPointer(avPosition, 2, GL_FLOAT, false, 8, vertex);
+//        glDrawArrays(GL_TRIANGLES, 0, 3);
+//    }
+
+    // TODO: 绘制四边形
+//    if (program > 0) {
+//        glUseProgram(program);
+//        glEnableVertexAttribArray(avPosition);
+//        glUniform4f(afPosition, 1.0f, 0.0f, 0.0f, 0.0f);
+//        glVertexAttribPointer(avPosition, 2, GL_FLOAT, false, 8, vertex2);
+//        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+//        SDK_LOG_D("callBackSurfaceDraw 绘制四边形");
+//    }
+
+    // TODO:绘制纹理
     if (program > 0) {
+        glBindTexture(GL_TEXTURE_2D, textureid);
+        // 8.使用渲染器
         glUseProgram(program);
+        // 9.使顶点坐标和纹理坐标属性数组有效
         glEnableVertexAttribArray(avPosition);
-        glVertexAttribPointer(avPosition, 2, GL_FLOAT, false, 8, vertex);
-        glUniform4f(afPosition, 1.0f, 0.0f, 0.0f, 0.0f);
-        glDrawArrays(GL_TRIANGLES, 0, 3);
-        SDK_LOG_D("callBackSurfaceDraw 绘制三角形")
+        glVertexAttribPointer(avPosition, 2, GL_FLOAT, false, 8, vertexData);
+        glEnableVertexAttribArray(afPosition);
+        glVertexAttribPointer(afPosition, 2, GL_FLOAT, false, 8, textureData);
+        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+        // 解绑纹理
+        glBindTexture(GL_TEXTURE_2D, 0);
     }
+
 }
 
 extern "C"
@@ -110,4 +167,19 @@ Java_com_taxiao_opengl_JniSdkImpl_surfaceChanged(JNIEnv *env, jobject thiz, jint
     if (mTXEglThread != NULL) {
         mTXEglThread->surfaceChanged(width, height);
     }
+}
+
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_taxiao_opengl_JniSdkImpl_onDrawImage(JNIEnv *env, jobject thiz, jint width, jint height,
+                                              jint size,
+                                              jbyteArray bytes) {
+    // TODO: implement onDrawImage()
+    imageWidth = width;
+    imageHeight = height;
+    jbyte *elements = env->GetByteArrayElements(bytes, NULL);
+    // 申请空间赋值
+    image = malloc(size);
+    memcpy(image, elements, size);
+    env->ReleaseByteArrayElements(bytes, elements, 0);
 }
