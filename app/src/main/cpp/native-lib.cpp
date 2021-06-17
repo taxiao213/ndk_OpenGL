@@ -107,6 +107,9 @@ void callBackSurfaceCreated(void *ctx) {
         s_texture = glGetUniformLocation(program, "s_texture");
         u_Matrix = glGetUniformLocation(program, "u_Matrix");
         initMatrix(matrix);
+//        rotateMatrixForZ(45, matrix);
+//        translationMatrix(0.5, 0.5, matrix);
+
         for (int i = 0; i < 16; i++) {
             SDK_LOG_D("matrix: %d: %f", i, matrix[i]);
         }
@@ -133,6 +136,17 @@ void callBackSurfaceChanged(int width, int height, void *ctx) {
     SDK_LOG_D("callBackSurfaceChanged");
     TXEglThread *txEglThread = (TXEglThread *) ctx;
     glViewport(0.0f, 0.0f, txEglThread->surfaceWidth, txEglThread->surfaceHeight);
+    float screen = 1.0f * width / height;
+    float image = 1.0f * imageWidth / imageHeight;
+    if (screen > image) {
+        // 宽度缩放
+        float scale = width / (1.0f * height / imageHeight * imageWidth);
+        reflectionMatrix(-scale, scale, -1, 1, matrix);
+    } else {
+        // 高度缩放
+        float scale = height / (1.0f * width / imageWidth * imageHeight);
+        reflectionMatrix(-1, 1, -scale, scale, matrix);
+    }
 }
 
 // TODO: 回调函数 callBackSurfaceDraw
