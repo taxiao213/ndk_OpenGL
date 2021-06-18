@@ -65,12 +65,15 @@ public :
 
     void surfaceChanged(int width, int height);
 
+    void surfaceDestroy();
+
     void callBackOnSurfaceCreated(OnSurfaceCreated onSurfaceCreated, void *ctx);
 
     void callBackOnSurfaceChanged(OnSurfaceChanged onSurfaceChanged, void *ctx);
 
     void callBackOnSurfaceDraw(OnSurfaceDraw onSurfaceDraw, void *ctx);
 
+    // 设置渲染模式
     void setRenderType(int renderType);
 
     void notifyThread();

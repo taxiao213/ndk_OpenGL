@@ -39,7 +39,7 @@ static int loadShader(int shaderType, const char *source) {
  * @param fragmentSource 纹理坐标
  * @return
  */
-static int createProgram(const char *vertexSource, const char *fragmentSource) {
+static GLuint createProgram(const char *vertexSource, const char *fragmentSource) {
     int vertexShader = loadShader(GL_VERTEX_SHADER, vertexSource);
     int fragmentShader = loadShader(GL_FRAGMENT_SHADER, fragmentSource);
     GLuint program = glCreateProgram();

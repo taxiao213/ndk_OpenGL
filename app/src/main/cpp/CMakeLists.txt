@@ -8,7 +8,9 @@ add_library(
         native-lib.cpp
         egl/TXEglHelp.cpp
         egl/TXEglThread.cpp
-        shader/ShaderUtil.cpp
+        opengl/TXBaseOpengl.cpp
+        opengl/TXOpengl.cpp
+        opengl/TXOpenglFilterOne.cpp
         )
 
 

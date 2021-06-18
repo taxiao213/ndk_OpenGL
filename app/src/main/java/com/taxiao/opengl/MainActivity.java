@@ -20,15 +20,9 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         TXSurfaceView surface = findViewById(R.id.surface);
+        TXSurfaceView2 surface2 = findViewById(R.id.surface2);
         JniSdkImpl jniSdk = new JniSdkImpl();
-        surface.setJniSdkImpl(jniSdk);
-
-        Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher);
-        int byteCount = bitmap.getByteCount();
-        ByteBuffer byteBuffer = ByteBuffer.allocateDirect(byteCount);
-        bitmap.copyPixelsToBuffer(byteBuffer);
-        jniSdk.onDrawImage(bitmap.getWidth(), bitmap.getHeight(), byteCount, byteBuffer.array());
+//        surface.setJniSdkImpl(jniSdk);
+        surface2.setJniSdkImpl(jniSdk);
     }
-
-
 }

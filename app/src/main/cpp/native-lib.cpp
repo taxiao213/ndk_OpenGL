@@ -1,16 +1,18 @@
 #include <jni.h>
 #include <string>
-#include "egl/TXEglHelp.h"
-#include "egl/TXEglThread.h"
-#include "shader/ShaderSource.h"
-#include "shader/ShaderUtil.h"
-#include "matrix/TXMatrix.h"
+//#include "egl/TXEglHelp.h"
+//#include "egl/TXEglThread.h"
+//#include "shader/ShaderSource.h"
+//#include "shader/ShaderUtil.h"
+//#include "matrix/TXMatrix.h"
+
+#include "opengl/TXOpengl.h"
 
 JavaVM *jvm = NULL;
 ANativeWindow *mANativeWindow = NULL;
 TXEglHelp *mTxEglHelp = NULL;
 TXEglThread *mTXEglThread = NULL;
-int program;
+GLuint program;
 GLint avPosition;
 GLint afPosition;
 GLint s_texture;
@@ -20,6 +22,7 @@ void *image = NULL;
 int imageWidth;
 int imageHeight;
 float matrix[16];
+TXOpengl *txOpengl = NULL;
 
 // 获取 jvm
 JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *javaVm, void *reserved) {
@@ -147,6 +150,9 @@ void callBackSurfaceChanged(int width, int height, void *ctx) {
         float scale = height / (1.0f * width / imageWidth * imageHeight);
         reflectionMatrix(-1, 1, -scale, scale, matrix);
     }
+    if (txEglThread != NULL) {
+        txEglThread->notifyThread();
+    }
 }
 
 // TODO: 回调函数 callBackSurfaceDraw
@@ -236,10 +242,9 @@ Java_com_taxiao_opengl_JniSdkImpl_surfaceChanged(JNIEnv *env, jobject thiz, jint
 
 extern "C"
 JNIEXPORT void JNICALL
-Java_com_taxiao_opengl_JniSdkImpl_onDrawImage(JNIEnv *env, jobject thiz, jint width, jint height,
-                                              jint size,
-                                              jbyteArray bytes) {
-    // TODO: implement onDrawImage()
+Java_com_taxiao_opengl_JniSdkImpl_drawImage(JNIEnv *env, jobject thiz, jint width, jint height,
+                                            jint size, jbyteArray bytes) {
+    // TODO: implement drawImage()
     imageWidth = width;
     imageHeight = height;
     jbyte *elements = env->GetByteArrayElements(bytes, NULL);
@@ -247,4 +252,65 @@ Java_com_taxiao_opengl_JniSdkImpl_onDrawImage(JNIEnv *env, jobject thiz, jint wi
     image = malloc(size);
     memcpy(image, elements, size);
     env->ReleaseByteArrayElements(bytes, elements, 0);
+    if (mTXEglThread != NULL) {
+        mTXEglThread->notifyThread();
+    }
+}
+
+// -------------------------------------- surface  另一种写法 ----------------------------------
+
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_taxiao_opengl_JniSdkImpl_onSurfaceCreated(JNIEnv *env, jobject thiz, jobject surface) {
+    // TODO: implement onSurfaceCreated()
+    if (txOpengl == NULL) {
+        txOpengl = new TXOpengl();
+        txOpengl->onSurfaceCreate(env, surface);
+    }
+}
+
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_taxiao_opengl_JniSdkImpl_onSurfaceChanged(JNIEnv *env, jobject thiz, jint width,
+                                                   jint height) {
+    // TODO: implement onSurfaceChanged()
+    if (txOpengl != NULL) {
+        txOpengl->onSurfaceChange(width, height);
+    }
+}
+
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_taxiao_opengl_JniSdkImpl_onSurfaceDestroy(JNIEnv *env, jobject thiz) {
+    // TODO: implement onSurfaceDestroy()
+    if (txOpengl != NULL) {
+        txOpengl->onSurfaceDestroy();
+        delete txOpengl;
+        txOpengl = NULL;
+    }
+}
+
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_taxiao_opengl_JniSdkImpl_onDrawImage(JNIEnv *env, jobject thiz, jint width, jint height,
+                                              jint size,
+                                              jbyteArray bytes) {
+    // TODO: implement onDrawImage()
+    SDK_LOG_D("onDrawImage");
+    if (txOpengl != NULL) {
+        SDK_LOG_D("onDrawImage1");
+        jbyte *data = env->GetByteArrayElements(bytes, NULL);
+        txOpengl->setImage(data, size, width, height);
+        env->ReleaseByteArrayElements(bytes, data, 0);
+    }
+}
+
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_taxiao_opengl_JniSdkImpl_setRenderType(JNIEnv *env, jobject thiz, jint type) {
+    // TODO: implement setRenderType()
+    if (txOpengl != NULL) {
+        SDK_LOG_D("setRenderType");
+        txOpengl->setRenderType(type);
+    }
 }

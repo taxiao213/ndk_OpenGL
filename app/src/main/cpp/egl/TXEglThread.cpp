@@ -11,6 +11,7 @@
 TXEglThread::TXEglThread() {
     pthread_mutex_init(&mutex, NULL);
     pthread_cond_init(&mcond, NULL);
+    // TODO:渲染模式
 //    mRenderType = RENDER_AUTO;
     mRenderType = RENDER_MANUAL;
 }
@@ -54,8 +55,10 @@ void *eglThreadImpl(void *data) {
                 }
                 if (txEglThread->mRenderType == RENDER_AUTO) {
                     // 单位微妙 60帧 每秒60帧
+                    SDK_LOG_D("eglThreadImpl RENDER_AUTO");
                     usleep(1000000 / 60);
                 } else {
+                    SDK_LOG_D("eglThreadImpl RENDER_MANUAL");
                     pthread_mutex_lock(&txEglThread->mutex);
                     pthread_cond_wait(&txEglThread->mcond, &txEglThread->mutex);
                     pthread_mutex_unlock(&txEglThread->mutex);
@@ -114,5 +117,9 @@ void TXEglThread::notifyThread() {
     pthread_mutex_lock(&mutex);
     pthread_cond_signal(&mcond);
     pthread_mutex_unlock(&mutex);
+}
+
+void TXEglThread::surfaceDestroy() {
+
 }
 

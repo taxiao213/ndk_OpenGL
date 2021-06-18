@@ -24,6 +24,15 @@ public class JniSdkImpl {
 
     public native void surfaceChanged(int width, int height);
 
+    public native void drawImage(int width, int height, int size, byte[] bytes);
+
+    public native void onSurfaceCreated(Surface surface);
+
+    public native void onSurfaceChanged(int width, int height);
+
+    public native void onSurfaceDestroy();
+
     public native void onDrawImage(int width, int height, int size, byte[] bytes);
 
+    public native void setRenderType(int type);
 }
