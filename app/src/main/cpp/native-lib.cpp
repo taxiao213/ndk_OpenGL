@@ -102,7 +102,7 @@ void callBackSurfaceCreated(void *ctx) {
 //    }
 
     // TODO: 矩阵
-    program = createProgram(vertexMatrixSource, fragmentMatrixSource);
+    program = createProgram(vertexMatrixSource, fragmentMatrixSource, 0, 0);
     if (program > 0) {
         // 2.获取顶点坐标和纹理坐标属性
         avPosition = glGetAttribLocation(program, "av_Position");
@@ -287,6 +287,15 @@ Java_com_taxiao_opengl_JniSdkImpl_onSurfaceDestroy(JNIEnv *env, jobject thiz) {
         txOpengl->onSurfaceDestroy();
         delete txOpengl;
         txOpengl = NULL;
+    }
+}
+
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_taxiao_opengl_JniSdkImpl_onSurfaceChangedFilter(JNIEnv *env, jobject thiz) {
+    // TODO: implement onSurfaceChangedFilter()
+    if (txOpengl != NULL) {
+        txOpengl->onSurfaceChangedFilter();
     }
 }
 

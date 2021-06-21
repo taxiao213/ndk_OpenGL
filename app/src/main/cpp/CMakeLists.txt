@@ -11,6 +11,7 @@ add_library(
         opengl/TXBaseOpengl.cpp
         opengl/TXOpengl.cpp
         opengl/TXOpenglFilterOne.cpp
+        opengl/TXOpenglFilterTwo.cpp
         )
 
 

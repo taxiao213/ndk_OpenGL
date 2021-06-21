@@ -6,15 +6,15 @@
  * Github:https://github.com/taxiao213
 */
 
-#ifndef OPENGL_TXOPENGLFILTERONE_H
-#define OPENGL_TXOPENGLFILTERONE_H
+#ifndef OPENGL_TXOPENGLFILTERTWO_H
+#define OPENGL_TXOPENGLFILTERTWO_H
 
 #include "TXBaseOpengl.h"
 #include "../shader/ShaderSource.h"
 #include "../shader/ShaderUtil.h"
 #include "../matrix/TXMatrix.h"
 
-class TXOpenglFilterOne : public TXBaseOpengl {
+class TXOpenglFilterTwo : public TXBaseOpengl {
 public:
     GLint avPosition;
     GLint afPosition;
@@ -39,4 +39,4 @@ public:
 };
 
 
-#endif //OPENGL_TXOPENGLFILTERONE_H
+#endif //OPENGL_TXOPENGLFILTERTWO_H

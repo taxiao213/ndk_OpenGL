@@ -6,11 +6,11 @@
 */
 
 
-#include "TXOpenglFilterOne.h"
+#include "TXOpenglFilterTwo.h"
 
-void TXOpenglFilterOne::onSurfaceCreate() {
+void TXOpenglFilterTwo::onSurfaceCreate() {
     SDK_LOG_D("onSurfaceCreate");
-    mProgram = createProgram(vertexMatrixSource, fragmentMatrixSource, &vShader, &fShader);
+    mProgram = createProgram(vertexMatrixSource2, fragmentMatrixSource2, &vShader, &fShader);
     if (mProgram > 0) {
         // 2.获取顶点坐标和纹理坐标属性
         avPosition = glGetAttribLocation(mProgram, "av_Position");
@@ -36,14 +36,14 @@ void TXOpenglFilterOne::onSurfaceCreate() {
     }
 }
 
-void TXOpenglFilterOne::onSurfaceChange(int width, int height) {
+void TXOpenglFilterTwo::onSurfaceChange(int width, int height) {
     SDK_LOG_D("onSurfaceChange");
     this->mSurfaceWidth = width;
     this->mSurfaceHeight = height;
     setMatrix(width, height);
 }
 
-void TXOpenglFilterOne::onSurfaceDraw() {
+void TXOpenglFilterTwo::onSurfaceDraw() {
     SDK_LOG_D("onSurfaceDraw");
     glClearColor(0.0f, 1.0f, 1.0f, 0.0f);
     glClear(GL_COLOR_BUFFER_BIT);
@@ -65,16 +65,16 @@ void TXOpenglFilterOne::onSurfaceDraw() {
 
         // 9.使顶点坐标和纹理坐标属性数组有效
         glEnableVertexAttribArray(avPosition);
-        glVertexAttribPointer(avPosition, 2, GL_FLOAT, false, 8, vertexMatrixData);
+        glVertexAttribPointer(avPosition, 2, GL_FLOAT, false, 8, vertexMatrixData2);
         glEnableVertexAttribArray(afPosition);
-        glVertexAttribPointer(afPosition, 2, GL_FLOAT, false, 8, textureMatrixData);
+        glVertexAttribPointer(afPosition, 2, GL_FLOAT, false, 8, textureMatrixData2);
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
         // 解绑纹理
         glBindTexture(GL_TEXTURE_2D, 0);
     }
 }
 
-void TXOpenglFilterOne::onSurfaceDestroy() {
+void TXOpenglFilterTwo::onSurfaceDestroy() {
     SDK_LOG_D("onSurfaceDestroy");
     if (image != NULL)image = NULL;
     glDeleteTextures(1, &textureid);
@@ -85,7 +85,7 @@ void TXOpenglFilterOne::onSurfaceDestroy() {
     glDeleteProgram(mProgram);
 }
 
-void TXOpenglFilterOne::setImage(void *data, int size, int imageWidth, int imageHeight) {
+void TXOpenglFilterTwo::setImage(void *data, int size, int imageWidth, int imageHeight) {
     SDK_LOG_D("setImage, mProgram: %d", mProgram);
     this->imageWidth = imageWidth;
     this->imageHeight = imageHeight;
@@ -95,7 +95,7 @@ void TXOpenglFilterOne::setImage(void *data, int size, int imageWidth, int image
     }
 }
 
-void TXOpenglFilterOne::setMatrix(int width, int height) {
+void TXOpenglFilterTwo::setMatrix(int width, int height) {
     SDK_LOG_D("setMatrix");
     glViewport(0, 0, width, height);
     float screen = 1.0f * width / height;

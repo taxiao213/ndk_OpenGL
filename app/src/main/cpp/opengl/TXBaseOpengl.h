@@ -16,11 +16,11 @@
 
 class TXBaseOpengl {
 public:
-    char *mVertexSource;
-    char *mFragmentSource;
     float *mVertex;
     float *mFragment;
     GLuint mProgram;
+    GLuint vShader;
+    GLuint fShader;
     int mSurfaceWidth;
     int mSurfaceHeight;
     float mMatrix[16];

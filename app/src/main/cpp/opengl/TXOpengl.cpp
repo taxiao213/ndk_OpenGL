@@ -46,6 +46,36 @@ void callBackSurfaceDraw2(void *data) {
     }
 }
 
+void callBackOnSurfaceChangedFilter2(int width, int height, void *data) {
+    SDK_LOG_D("callBackOnSurfaceChangedFilter2");
+    TXOpengl *opengl = (TXOpengl *) data;
+    if (opengl != NULL) {
+        if (opengl->mTXBaseOpengl != NULL) {
+            opengl->mTXBaseOpengl->onSurfaceDestroy();
+            delete opengl->mTXBaseOpengl;
+            opengl->mTXBaseOpengl = NULL;
+        }
+        SDK_LOG_D("callBackOnSurfaceChangedFilter2 创建过滤器");
+        opengl->mTXBaseOpengl = new TXOpenglFilterTwo();
+        opengl->mTXBaseOpengl->onSurfaceCreate();
+        opengl->mTXBaseOpengl->onSurfaceChange(width, height);
+        opengl->mTXBaseOpengl->setImage(opengl->mData, 0, opengl->mPicWidth, opengl->mPicHeight);
+        opengl->mTXEglThread->notifyThread();
+    }
+}
+
+void callBackOnSurfaceDestroy2(void *data) {
+    SDK_LOG_D("callBackOnSurfaceDestroy2");
+    TXOpengl *opengl = (TXOpengl *) data;
+    if (opengl != NULL) {
+        if (opengl->mTXBaseOpengl != NULL) {
+            opengl->mTXBaseOpengl->onSurfaceDestroy();
+            delete opengl->mTXBaseOpengl;
+            opengl->mTXBaseOpengl = NULL;
+        }
+    }
+}
+
 void TXOpengl::onSurfaceCreate(JNIEnv *env, jobject surface) {
     SDK_LOG_D("onSurfaceCreate");
     mANativeWindow = ANativeWindow_fromSurface(env, surface);
@@ -53,6 +83,8 @@ void TXOpengl::onSurfaceCreate(JNIEnv *env, jobject surface) {
     mTXEglThread->callBackOnSurfaceCreated(callBackSurfaceCreated2, this);
     mTXEglThread->callBackOnSurfaceChanged(callBackSurfaceChanged2, this);
     mTXEglThread->callBackOnSurfaceDraw(callBackSurfaceDraw2, this);
+    mTXEglThread->callBackOnSurfaceChangedFilter(callBackOnSurfaceChangedFilter2, this);
+    mTXEglThread->callBackOnSurfaceDestroy(callBackOnSurfaceDestroy2, this);
     mTXBaseOpengl = new TXOpenglFilterOne();
     mTXEglThread->surfaceCreated(mANativeWindow);
 }
@@ -91,8 +123,14 @@ void TXOpengl::onSurfaceDestroy() {
 void TXOpengl::setImage(void *data, int size, int imageWidth, int imageHeight) {
     SDK_LOG_D("setImage");
     if (mTXBaseOpengl != NULL) {
+        if (mData != NULL) {
+            free(mData);
+            mData = NULL;
+        }
         mData = malloc(size);
         memcpy(mData, data, size);
+        mPicWidth = imageWidth;
+        mPicHeight = imageHeight;
         mTXBaseOpengl->setImage(mData, size, imageWidth, imageHeight);
         if (mTXEglThread != NULL) {
             mTXEglThread->notifyThread();
@@ -103,5 +141,11 @@ void TXOpengl::setImage(void *data, int size, int imageWidth, int imageHeight) {
 void TXOpengl::setRenderType(int type) {
     if (mTXEglThread != NULL) {
         mTXEglThread->setRenderType(type);
+    }
+}
+
+void TXOpengl::onSurfaceChangedFilter() {
+    if (mTXEglThread != NULL) {
+        mTXEglThread->surfaceChangedFilter();
     }
 }

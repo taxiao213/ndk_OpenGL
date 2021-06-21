@@ -45,6 +45,14 @@ void *eglThreadImpl(void *data) {
                                                   txEglThread->onSurfaceChangedCtx);
                     txEglThread->isStart = true;
                 }
+                if (txEglThread->isChangeFilter) {
+                    SDK_LOG_D("eglThreadImpl call onSurfaceChangedFilter");
+                    txEglThread->isChangeFilter = false;
+                    // TODO: 回调到外层调用
+                    txEglThread->onSurfaceChangedFilter(txEglThread->surfaceWidth,
+                                                        txEglThread->surfaceHeight,
+                                                        txEglThread->onSurfaceChangedFilterCtx);
+                }
                 if (txEglThread->isStart) {
                     SDK_LOG_D("eglThreadImpl call surfaceDraw");
 //                    glClearColor(0.0f, 1.0f, 0.0f, 0.0f);
@@ -66,6 +74,7 @@ void *eglThreadImpl(void *data) {
                 SDK_LOG_D("eglThreadImpl draw");
                 if (txEglThread->isExit) {
                     SDK_LOG_D("eglThreadImpl call surfaceExit");
+                    txEglThread->onSurfaceDsetroy(txEglThread->onSurfaceDsetroyCtx);
                     break;
                 }
             }
@@ -92,6 +101,29 @@ void TXEglThread::surfaceChanged(int width, int height) {
     notifyThread();
 }
 
+void TXEglThread::setRenderType(int renderType) {
+    this->mRenderType = renderType;
+}
+
+void TXEglThread::notifyThread() {
+    pthread_mutex_lock(&mutex);
+    pthread_cond_signal(&mcond);
+    pthread_mutex_unlock(&mutex);
+}
+
+void TXEglThread::surfaceChangedFilter() {
+    isChangeFilter = true;
+    notifyThread();
+}
+
+void TXEglThread::surfaceDestroy() {
+    isExit = true;
+    notifyThread();
+    pthread_join(mEglPthread, NULL);
+    mANativeWindow = NULL;
+    mEglPthread = -1;
+}
+
 void
 TXEglThread::callBackOnSurfaceCreated(TXEglThread::OnSurfaceCreated onSurfaceCreated, void *ctx) {
     this->onSurfaceCreated = onSurfaceCreated;
@@ -109,17 +141,17 @@ void TXEglThread::callBackOnSurfaceDraw(TXEglThread::OnSurfaceDraw onSurfaceDraw
     this->onSurfaceDrawCtx = ctx;
 }
 
-void TXEglThread::setRenderType(int renderType) {
-    this->mRenderType = renderType;
+
+void TXEglThread::callBackOnSurfaceChangedFilter(
+        TXEglThread::OnSurfaceChangedFilter onSurfaceChangedFilter, void *ctx) {
+    this->onSurfaceChangedFilter = onSurfaceChangedFilter;
+    this->onSurfaceChangedFilterCtx = ctx;
 }
 
-void TXEglThread::notifyThread() {
-    pthread_mutex_lock(&mutex);
-    pthread_cond_signal(&mcond);
-    pthread_mutex_unlock(&mutex);
-}
 
-void TXEglThread::surfaceDestroy() {
-
+void
+TXEglThread::callBackOnSurfaceDestroy(TXEglThread::OnSurfaceDsetroy onSurfaceDsetroy, void *ctx) {
+    this->onSurfaceDsetroy = onSurfaceDsetroy;
+    this->onSurfaceDsetroyCtx = ctx;
 }
 

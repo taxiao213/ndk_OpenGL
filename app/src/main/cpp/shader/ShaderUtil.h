@@ -10,8 +10,6 @@
 #ifndef OPENGL_SHADERUTIL_H
 #define OPENGL_SHADERUTIL_H
 
-#endif //OPENGL_SHADERUTIL_H
-
 #include "../android_log.h"
 #include <GLES2/gl2.h>
 
@@ -39,7 +37,8 @@ static int loadShader(int shaderType, const char *source) {
  * @param fragmentSource 纹理坐标
  * @return
  */
-static GLuint createProgram(const char *vertexSource, const char *fragmentSource) {
+static GLuint createProgram(const char *vertexSource, const char *fragmentSource, GLuint *vShader,
+                            GLuint *fShader) {
     int vertexShader = loadShader(GL_VERTEX_SHADER, vertexSource);
     int fragmentShader = loadShader(GL_FRAGMENT_SHADER, fragmentSource);
     GLuint program = glCreateProgram();
@@ -50,6 +49,10 @@ static GLuint createProgram(const char *vertexSource, const char *fragmentSource
     glAttachShader(program, vertexShader);
     glAttachShader(program, fragmentShader);
     glLinkProgram(program);
+    *vShader = vertexShader;
+    *fShader = fragmentShader;
     SDK_LOG_D("createProgram success");
     return program;
 }
+
+#endif //OPENGL_SHADERUTIL_H

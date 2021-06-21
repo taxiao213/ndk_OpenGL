@@ -30,6 +30,7 @@ public:
     bool isChange = false;
     bool isExit = false;
     bool isStart = false;
+    bool isChangeFilter = false; // 改变滤镜
     int surfaceWidth = 0;
     int surfaceHeight = 0;
 
@@ -51,10 +52,21 @@ public:
     OnSurfaceDraw onSurfaceDraw;
     void *onSurfaceDrawCtx;
 
+    // 回调函数 OnSurfaceChangedFilter
+    typedef void (*OnSurfaceChangedFilter)(int width, int height, void *);
+
+    OnSurfaceChangedFilter onSurfaceChangedFilter;
+    void *onSurfaceChangedFilterCtx;
+
+    typedef void (*OnSurfaceDsetroy)(void *);
+
+    OnSurfaceDsetroy onSurfaceDsetroy;
+    void *onSurfaceDsetroyCtx;
+
     // 线程锁
     pthread_mutex_t mutex;
     pthread_cond_t mcond;
-    int mRenderType =0;
+    int mRenderType = 0;
 
 public :
     TXEglThread();
@@ -67,11 +79,17 @@ public :
 
     void surfaceDestroy();
 
+    void surfaceChangedFilter();
+
     void callBackOnSurfaceCreated(OnSurfaceCreated onSurfaceCreated, void *ctx);
 
     void callBackOnSurfaceChanged(OnSurfaceChanged onSurfaceChanged, void *ctx);
 
     void callBackOnSurfaceDraw(OnSurfaceDraw onSurfaceDraw, void *ctx);
+
+    void callBackOnSurfaceChangedFilter(OnSurfaceChangedFilter onSurfaceChangedFilter, void *ctx);
+
+    void callBackOnSurfaceDestroy(OnSurfaceDsetroy onSurfaceDsetroy, void *ctx);
 
     // 设置渲染模式
     void setRenderType(int renderType);

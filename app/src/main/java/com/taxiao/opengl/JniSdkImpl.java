@@ -35,4 +35,6 @@ public class JniSdkImpl {
     public native void onDrawImage(int width, int height, int size, byte[] bytes);
 
     public native void setRenderType(int type);
+
+    public native void onSurfaceChangedFilter();
 }

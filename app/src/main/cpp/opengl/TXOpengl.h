@@ -11,6 +11,7 @@
 #define OPENGL_TXOPENGL_H
 
 #include "TXOpenglFilterOne.h"
+#include "TXOpenglFilterTwo.h"
 #include "../egl/TXEglThread.h"
 
 class TXOpengl {
@@ -19,6 +20,8 @@ public:
     TXEglThread *mTXEglThread;
     TXBaseOpengl *mTXBaseOpengl;
     void *mData = NULL;
+    int mPicWidth;
+    int mPicHeight;
 public:
     TXOpengl();
 
@@ -33,6 +36,8 @@ public:
     void setImage(void *data, int size, int imageWidth, int imageHeight);
 
     void setRenderType(int type);
+
+    void onSurfaceChangedFilter();// 切换滤镜
 };
 
 

@@ -10,8 +10,6 @@
 #ifndef OPENGL_TXMATRIX_H
 #define OPENGL_TXMATRIX_H
 
-#endif //OPENGL_TXMATRIX_H
-
 #include "math.h"
 
 // 初始化矩阵
@@ -105,3 +103,5 @@ static void reflectionMatrix(float left, float right, float bottom, float top, f
     matrix[10] = 1;
     matrix[11] = 1;
 }
+
+#endif //OPENGL_TXMATRIX_H
