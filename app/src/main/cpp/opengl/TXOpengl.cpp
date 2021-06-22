@@ -9,11 +9,11 @@
 #include "TXOpengl.h"
 
 TXOpengl::TXOpengl() {
-
+    filterType = FILTER_IMAGE;
 }
 
 TXOpengl::~TXOpengl() {
-
+    filterType = -1;
 }
 
 void callBackSurfaceCreated2(void *data) {
@@ -85,7 +85,11 @@ void TXOpengl::onSurfaceCreate(JNIEnv *env, jobject surface) {
     mTXEglThread->callBackOnSurfaceDraw(callBackSurfaceDraw2, this);
     mTXEglThread->callBackOnSurfaceChangedFilter(callBackOnSurfaceChangedFilter2, this);
     mTXEglThread->callBackOnSurfaceDestroy(callBackOnSurfaceDestroy2, this);
-    mTXBaseOpengl = new TXOpenglFilterOne();
+    if (filterType == FILTER_YUV) {
+        mTXBaseOpengl = new TXOpenglFilterYUV();
+    } else {
+        mTXBaseOpengl = new TXOpenglFilterOne();
+    }
     mTXEglThread->surfaceCreated(mANativeWindow);
 }
 
@@ -148,4 +152,17 @@ void TXOpengl::onSurfaceChangedFilter() {
     if (mTXEglThread != NULL) {
         mTXEglThread->surfaceChangedFilter();
     }
+}
+
+void TXOpengl::setYUVData(void *yuv_y, void *yuv_u, void *yuv_v, int width, int height) {
+    if (mTXBaseOpengl != NULL) {
+        mTXBaseOpengl->setYUVData(yuv_y, yuv_u, yuv_v, width, height);
+    }
+    if (mTXEglThread != NULL) {
+        mTXEglThread->notifyThread();
+    }
+}
+
+void TXOpengl::setFilterType(int type) {
+    filterType = type;
 }

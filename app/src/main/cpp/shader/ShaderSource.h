@@ -136,4 +136,47 @@ static float textureMatrixData2[] = {
         1, 0
 };
 
+// 渲染YUV数据
+static const char *vertexMatrixSource3 = "attribute vec4 av_Position;\n"
+                                         "attribute vec2 af_Position;\n"
+                                         "varying vec2 v_texPosition;\n"
+                                         "uniform mat4 u_Matrix;\n"
+                                         "void main() {\n"
+                                         "    v_texPosition = af_Position;\n"
+                                         "    gl_Position = av_Position * u_Matrix;\n"
+                                         "}";
+
+static const char *fragmentMatrixSource3 = "precision mediump float;\n"
+                                           "varying vec2 v_texPosition;\n"
+                                           "uniform sampler2D sampler_y;\n"
+                                           "uniform sampler2D sampler_u;\n"
+                                           "uniform sampler2D sampler_v;\n"
+                                           "void main() {\n"
+                                           "    float y, u, v;\n"
+                                           "    y = texture2D(sampler_y, v_texPosition).r;\n"
+                                           "    u = texture2D(sampler_u, v_texPosition).r - 0.5;\n"
+                                           "    v = texture2D(sampler_v, v_texPosition).r - 0.5;\n"
+                                           "\n"
+                                           "    vec3 rgb;\n"
+                                           "    rgb.r = y + 1.403 * v;\n"
+                                           "    rgb.g = y - 0.344 * u - 0.714 * v;\n"
+                                           "    rgb.b = y + 1.770 * u;\n"
+                                           "    gl_FragColor = vec4(rgb, 1);\n"
+                                           "}";
+// 绘制四边形
+static float vertexMatrixData3[] = {
+        -1, -1,
+        1, -1,
+        -1, 1,
+        1, 1,
+};
+
+// 纹理坐标
+static float textureMatrixData3[] = {
+        0, 1,
+        1, 1,
+        0, 0,
+        1, 0
+};
+
 #endif //OPENGL_SHADERSOURCE_H

@@ -37,4 +37,8 @@ public class JniSdkImpl {
     public native void setRenderType(int type);
 
     public native void onSurfaceChangedFilter();
+
+    public native void setYUVData(byte[] yuv_y, byte[] yuv_u, byte[] yuv_v, int width, int height);
+
+    public native void setFilterType(int type);
 }

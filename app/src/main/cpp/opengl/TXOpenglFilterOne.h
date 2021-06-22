@@ -12,7 +12,6 @@
 #include "TXBaseOpengl.h"
 #include "../shader/ShaderSource.h"
 #include "../shader/ShaderUtil.h"
-#include "../matrix/TXMatrix.h"
 
 class TXOpenglFilterOne : public TXBaseOpengl {
 public:
@@ -34,8 +33,6 @@ public:
     void onSurfaceDestroy();
 
     void setImage(void *data, int size, int imageWidth, int imageHeight);
-
-    void setMatrix(int width, int height);
 };
 
 

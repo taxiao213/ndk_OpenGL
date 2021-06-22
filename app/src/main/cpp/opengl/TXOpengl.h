@@ -12,7 +12,11 @@
 
 #include "TXOpenglFilterOne.h"
 #include "TXOpenglFilterTwo.h"
+#include "TXOpenglFilterYUV.h"
 #include "../egl/TXEglThread.h"
+
+#define FILTER_IMAGE 1
+#define FILTER_YUV 2
 
 class TXOpengl {
 public:
@@ -22,6 +26,7 @@ public:
     void *mData = NULL;
     int mPicWidth;
     int mPicHeight;
+    int filterType;
 public:
     TXOpengl();
 
@@ -38,6 +43,10 @@ public:
     void setRenderType(int type);
 
     void onSurfaceChangedFilter();// 切换滤镜
+
+    void setYUVData(void *yuv_y, void *yuv_u, void *yuv_v, int width, int height);
+
+    void setFilterType(int type);
 };
 
 

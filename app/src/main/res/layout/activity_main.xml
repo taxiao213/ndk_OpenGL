@@ -12,6 +12,12 @@
         android:layout_width="match_parent"
         android:layout_height="200dp" />
 
+    <com.taxiao.opengl.TXSurfaceView3
+        android:id="@+id/surface3"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:layout_marginTop="10dp" />
+
     <com.taxiao.opengl.TXSurfaceView2
         android:id="@+id/surface2"
         android:layout_width="match_parent"

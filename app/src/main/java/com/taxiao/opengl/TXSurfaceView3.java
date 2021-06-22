@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -19,40 +20,42 @@ import java.nio.ByteBuffer;
  * CSDN:http://blog.csdn.net/yin13753884368/article
  * Github:https://github.com/taxiao213
  */
-public class TXSurfaceView2 extends SurfaceView implements SurfaceHolder.Callback {
+public class TXSurfaceView3 extends SurfaceView implements SurfaceHolder.Callback {
     private JniSdkImpl jniSdk;
+    private ISurfaceInterface surfaceInterface;
 
-    public TXSurfaceView2(Context context) {
+    public TXSurfaceView3(Context context) {
         this(context, null);
     }
 
-    public TXSurfaceView2(Context context, AttributeSet attrs) {
+    public TXSurfaceView3(Context context, AttributeSet attrs) {
         this(context, attrs, 0);
     }
 
-    public TXSurfaceView2(Context context, AttributeSet attrs, int defStyleAttr) {
+    public TXSurfaceView3(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         getHolder().addCallback(this);
     }
 
+
     @Override
     public void surfaceCreated(@NonNull SurfaceHolder holder) {
-        Surface surface = holder.getSurface();
         if (jniSdk != null) {
-            jniSdk.setFilterType(1);
+            jniSdk.setFilterType(2);
+            Surface surface = holder.getSurface();
+            Log.d("TXSurfaceView3", "surfaceCreated ");
             jniSdk.onSurfaceCreated(surface);
             jniSdk.setRenderType(2);
-            Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher);
-            int byteCount = bitmap.getByteCount();
-            ByteBuffer byteBuffer = ByteBuffer.allocateDirect(byteCount);
-            bitmap.copyPixelsToBuffer(byteBuffer);
-            jniSdk.onDrawImage(bitmap.getWidth(), bitmap.getHeight(), byteCount, byteBuffer.array());
+            if (surfaceInterface != null) {
+                surfaceInterface.init();
+            }
         }
     }
 
     @Override
     public void surfaceChanged(@NonNull SurfaceHolder holder, int format, int width, int height) {
         if (jniSdk != null) {
+            Log.d("TXSurfaceView3", "surfaceChanged ");
             jniSdk.onSurfaceChanged(width, height);
         }
     }
@@ -64,7 +67,12 @@ public class TXSurfaceView2 extends SurfaceView implements SurfaceHolder.Callbac
         }
     }
 
-    public void setJniSdkImpl(JniSdkImpl jniSdk) {
+    public void setJniSdkImpl(JniSdkImpl jniSdk, ISurfaceInterface surfaceInterface) {
         this.jniSdk = jniSdk;
+        this.surfaceInterface = surfaceInterface;
+    }
+
+    public interface ISurfaceInterface {
+        void init();
     }
 }

@@ -54,3 +54,23 @@ void TXBaseOpengl::onSurfaceDestroy() {
 void TXBaseOpengl::setImage(void *data, int size, int imageWidth, int imageHeight) {
 
 }
+
+void TXBaseOpengl::setYUVData(void *yuv_y, void *yuv_u, void *yuv_v, int width, int height) {
+
+}
+
+void TXBaseOpengl::setMatrix(int width, int height, int imageWidth, int imageHeight) {
+    SDK_LOG_D("setMatrix");
+    glViewport(0, 0, width, height);
+    float screen = 1.0f * width / height;
+    float image = 1.0f * imageWidth / imageHeight;
+    if (screen > image) {
+        // 宽度缩放
+        float scale = width / (1.0f * height / imageHeight * imageWidth);
+        reflectionMatrix(-scale, scale, -1, 1, mMatrix);
+    } else {
+        // 高度缩放
+        float scale = height / (1.0f * width / imageWidth * imageHeight);
+        reflectionMatrix(-1, 1, -scale, scale, mMatrix);
+    }
+}

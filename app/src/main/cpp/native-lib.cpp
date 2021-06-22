@@ -23,6 +23,7 @@ int imageWidth;
 int imageHeight;
 float matrix[16];
 TXOpengl *txOpengl = NULL;
+int filterType;
 
 // 获取 jvm
 JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *javaVm, void *reserved) {
@@ -265,6 +266,7 @@ Java_com_taxiao_opengl_JniSdkImpl_onSurfaceCreated(JNIEnv *env, jobject thiz, jo
     // TODO: implement onSurfaceCreated()
     if (txOpengl == NULL) {
         txOpengl = new TXOpengl();
+        txOpengl->setFilterType(filterType);
         txOpengl->onSurfaceCreate(env, surface);
     }
 }
@@ -287,6 +289,7 @@ Java_com_taxiao_opengl_JniSdkImpl_onSurfaceDestroy(JNIEnv *env, jobject thiz) {
         txOpengl->onSurfaceDestroy();
         delete txOpengl;
         txOpengl = NULL;
+        filterType = -1;
     }
 }
 
@@ -322,4 +325,30 @@ Java_com_taxiao_opengl_JniSdkImpl_setRenderType(JNIEnv *env, jobject thiz, jint 
         SDK_LOG_D("setRenderType");
         txOpengl->setRenderType(type);
     }
+}
+
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_taxiao_opengl_JniSdkImpl_setYUVData(JNIEnv *env, jobject thiz, jbyteArray yuv_y,
+                                             jbyteArray yuv_u, jbyteArray yuv_v, jint width,
+                                             jint height) {
+    // TODO: implement setYUVData()
+    // 设置YUV数据
+    if (txOpengl != NULL) {
+        SDK_LOG_D("setYUVData");
+        jbyte *y = env->GetByteArrayElements(yuv_y, NULL);
+        jbyte *u = env->GetByteArrayElements(yuv_u, NULL);
+        jbyte *v = env->GetByteArrayElements(yuv_v, NULL);
+        txOpengl->setYUVData(y, u, v, width, height);
+        env->ReleaseByteArrayElements(yuv_y, y, 0);
+        env->ReleaseByteArrayElements(yuv_u, u, 0);
+        env->ReleaseByteArrayElements(yuv_v, v, 0);
+    }
+}
+
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_taxiao_opengl_JniSdkImpl_setFilterType(JNIEnv *env, jobject thiz, jint type) {
+    // TODO: implement setFilterType()
+    filterType = type;
 }

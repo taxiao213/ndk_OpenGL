@@ -13,6 +13,7 @@
 #include <GLES2/gl2.h>
 #include "../android_log.h"
 #include <cstring>
+#include "../matrix/TXMatrix.h"
 
 class TXBaseOpengl {
 public:
@@ -38,6 +39,11 @@ public:
     virtual void onSurfaceDestroy();
 
     virtual void setImage(void *data, int size, int imageWidth, int imageHeight);
+
+    virtual void setYUVData(void *yuv_y, void *yuv_u, void *yuv_v, int width, int height);
+
+    void setMatrix(int width, int height, int imageWidth, int imageHeight);
+
 };
 
 

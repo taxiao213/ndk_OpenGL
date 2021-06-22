@@ -40,7 +40,7 @@ void TXOpenglFilterOne::onSurfaceChange(int width, int height) {
     SDK_LOG_D("onSurfaceChange");
     this->mSurfaceWidth = width;
     this->mSurfaceHeight = height;
-    setMatrix(width, height);
+    setMatrix(width, height, imageWidth, imageHeight);
 }
 
 void TXOpenglFilterOne::onSurfaceDraw() {
@@ -91,22 +91,6 @@ void TXOpenglFilterOne::setImage(void *data, int size, int imageWidth, int image
     this->imageHeight = imageHeight;
     this->image = data;
     if (mSurfaceWidth > 0 && mSurfaceHeight > 0) {
-        setMatrix(mSurfaceWidth, mSurfaceHeight);
-    }
-}
-
-void TXOpenglFilterOne::setMatrix(int width, int height) {
-    SDK_LOG_D("setMatrix");
-    glViewport(0, 0, width, height);
-    float screen = 1.0f * width / height;
-    float image = 1.0f * imageWidth / imageHeight;
-    if (screen > image) {
-        // 宽度缩放
-        float scale = width / (1.0f * height / imageHeight * imageWidth);
-        reflectionMatrix(-scale, scale, -1, 1, mMatrix);
-    } else {
-        // 高度缩放
-        float scale = height / (1.0f * width / imageWidth * imageHeight);
-        reflectionMatrix(-1, 1, -scale, scale, mMatrix);
+        setMatrix(mSurfaceWidth, mSurfaceHeight, imageWidth, imageHeight);
     }
 }
