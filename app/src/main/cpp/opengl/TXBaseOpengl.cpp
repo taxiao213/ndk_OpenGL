@@ -60,7 +60,8 @@ void TXBaseOpengl::setYUVData(void *yuv_y, void *yuv_u, void *yuv_v, int width, 
 }
 
 void TXBaseOpengl::setMatrix(int width, int height, int imageWidth, int imageHeight) {
-    SDK_LOG_D("setMatrix");
+    SDK_LOG_D("setMatrix width:%d, height:%d, imageWidth:%d, imageHeight:%d ", width, height,
+              imageWidth, imageHeight);
     glViewport(0, 0, width, height);
     float screen = 1.0f * width / height;
     float image = 1.0f * imageWidth / imageHeight;

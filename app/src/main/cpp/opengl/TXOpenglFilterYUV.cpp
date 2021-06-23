@@ -48,7 +48,7 @@ void TXOpenglFilterYUV::onSurfaceChange(int width, int height) {
     SDK_LOG_D("onSurfaceChange");
     this->mSurfaceWidth = width;
     this->mSurfaceHeight = height;
-//    setMatrix(width, height, imageWidth, imageHeight);
+    setMatrix(width, height, yuv_wdith, yuv_height);
 }
 
 void TXOpenglFilterYUV::onSurfaceDraw() {
