@@ -34,5 +34,11 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="切换滤镜" />
+
+        <Button
+            android:id="@+id/bt2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="egl 环境" />
     </LinearLayout>
 </LinearLayout>

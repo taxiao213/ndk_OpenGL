@@ -2,6 +2,7 @@ package com.taxiao.opengl;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
@@ -33,6 +34,7 @@ public class MainActivity extends AppCompatActivity {
         TXSurfaceView2 surface2 = findViewById(R.id.surface2);
         TXSurfaceView3 surface3 = findViewById(R.id.surface3);
         Button button1 = findViewById(R.id.bt1);
+        Button button2 = findViewById(R.id.bt2);
         final JniSdkImpl jniSdk = new JniSdkImpl();
 //        surface.setJniSdkImpl(jniSdk);
 //        surface2.setJniSdkImpl(jniSdk);
@@ -40,6 +42,13 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 jniSdk.onSurfaceChangedFilter();
+            }
+        });
+
+        button2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(MainActivity.this, EGLActivity.class));
             }
         });
 
