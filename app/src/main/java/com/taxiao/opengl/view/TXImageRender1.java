@@ -220,7 +220,7 @@ public class TXImageRender1 extends TXEglRender {
             GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, 0);
             GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, 0);
 
-            imageTexure = loadTexture(R.mipmap.iamge_01);
+            imageTexure = loadTexture(R.mipmap.ic_launcher);
         }
     }
 
