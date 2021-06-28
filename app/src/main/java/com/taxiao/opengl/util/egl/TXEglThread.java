@@ -2,6 +2,8 @@ package com.taxiao.opengl.util.egl;
 
 import android.util.Log;
 
+import com.taxiao.opengl.util.LogUtils;
+
 import java.lang.ref.WeakReference;
 
 /**
@@ -45,13 +47,12 @@ public class TXEglThread extends Thread {
     @Override
     public void run() {
         super.run();
+        LogUtils.d("time_egl", "time3: " + System.currentTimeMillis());
         if (mEglSurfaceViewWeakReference == null || mEglSurfaceViewWeakReference.get() == null) {
             Log.d(TAG, "mEglSurfaceViewWeakReference == null || mEglSurfaceViewWeakReference.get() == null");
             return;
         }
         mIsStart = false;
-        mIsCreate = false;
-        mIsChange = false;
         mIsExit = false;
         mObject = new Object();
         mTXEglHelp = new TXEglHelp();
@@ -104,24 +105,24 @@ public class TXEglThread extends Thread {
     }
 
     private void onCreate() {
-        Log.d(TAG, "onCreate");
         if (mIsCreate && mEglSurfaceViewWeakReference != null && mEglSurfaceViewWeakReference.get() != null && mEglSurfaceViewWeakReference.get().mTXEglRender != null) {
+            Log.d(TAG, "onCreate");
             mEglSurfaceViewWeakReference.get().mTXEglRender.onSurfaceCreated();
             mIsCreate = false;
         }
     }
 
     private void onChange() {
-        Log.d(TAG, "onChange");
         if (mIsChange && mEglSurfaceViewWeakReference != null && mEglSurfaceViewWeakReference.get() != null && mEglSurfaceViewWeakReference.get().mTXEglRender != null) {
+            Log.d(TAG, "onChange");
             mEglSurfaceViewWeakReference.get().mTXEglRender.onSurfaceChanged(mWidth, mHeight);
             mIsChange = false;
         }
     }
 
     private void onDraw() {
-        Log.d(TAG, "onDraw");
         if (mEglSurfaceViewWeakReference != null && mEglSurfaceViewWeakReference.get() != null && mEglSurfaceViewWeakReference.get().mTXEglRender != null && mTXEglHelp != null) {
+            Log.d(TAG, "onDraw");
             mEglSurfaceViewWeakReference.get().mTXEglRender.onDrawFrame();
             // 解决手动绘制时无法渲染
             if (!mIsStart) {
@@ -153,6 +154,7 @@ public class TXEglThread extends Thread {
     // 渲染
     public void requestRender() {
         if (mObject != null) {
+            Log.d(TAG, "requestRender");
             synchronized (mObject) {
                 mObject.notifyAll();
             }

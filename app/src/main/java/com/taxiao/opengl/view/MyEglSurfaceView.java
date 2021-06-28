@@ -1,4 +1,4 @@
-package com.taxiao.opengl;
+package com.taxiao.opengl.view;
 
 import android.content.Context;
 import android.util.AttributeSet;

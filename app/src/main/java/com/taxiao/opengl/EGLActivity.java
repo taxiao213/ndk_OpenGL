@@ -9,6 +9,8 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.taxiao.opengl.util.egl.TXEglHelp;
+import com.taxiao.opengl.view.MyEglSurfaceView;
+import com.taxiao.opengl.view.TXGLSurfaceImageView;
 
 import java.util.concurrent.Executors;
 
@@ -27,6 +29,7 @@ public class EGLActivity extends AppCompatActivity {
         setContentView(R.layout.activity_egl);
         SurfaceView surface = findViewById(R.id.surface);
         MyEglSurfaceView surface1 = findViewById(R.id.surface1);
+        TXGLSurfaceImageView surface2 = findViewById(R.id.surface2);
         surface.getHolder().addCallback(new SurfaceHolder.Callback() {
             @Override
             public void surfaceCreated(@NonNull final SurfaceHolder holder) {

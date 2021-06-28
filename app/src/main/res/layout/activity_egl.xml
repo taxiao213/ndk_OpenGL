@@ -10,10 +10,20 @@
     <SurfaceView
         android:id="@+id/surface"
         android:layout_width="match_parent"
-        android:layout_height="200dp" />
+        android:layout_height="0dp"
+        android:layout_weight="1" />
 
-    <com.taxiao.opengl.MyEglSurfaceView
+    <com.taxiao.opengl.view.MyEglSurfaceView
         android:id="@+id/surface1"
         android:layout_width="match_parent"
-        android:layout_height="200dp" />
+        android:layout_height="0dp"
+        android:layout_marginTop="5dp"
+        android:layout_weight="1" />
+
+    <com.taxiao.opengl.view.TXGLSurfaceImageView
+        android:id="@+id/surface2"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginTop="5dp"
+        android:layout_weight="1" />
 </LinearLayout>
