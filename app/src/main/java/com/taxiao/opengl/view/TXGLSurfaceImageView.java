@@ -31,9 +31,12 @@ public class TXGLSurfaceImageView extends TXEglSurfaceView {
 
     public TXGLSurfaceImageView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        setRender(new TXImageRender1(context));
-        setRenderMode(TXEglThread.RENDERMODE_WHEN_DIRTY);
-        ViewGroup.LayoutParams layoutParams = getLayoutParams();
     }
 
+    @Override
+    protected void onSizeChanged(int width, int height, int oldw, int oldh) {
+        super.onSizeChanged(width, height, oldw, oldh);
+        setRender(new TXImageRender1(getContext(), width, height));
+        setRenderMode(TXEglThread.RENDERMODE_WHEN_DIRTY);
+    }
 }

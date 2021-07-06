@@ -18,6 +18,7 @@ import java.nio.FloatBuffer;
 
 
 /**
+ * 多Surface 渲染
  * VBO:Vertex Buffer object
  * 渲染图片 使用VBO
  * 不使用VBO时，我们每次绘制（ glDrawArrays ）图形时都是从本地内存处获取顶点数据然后传输给OpenGL来绘制，这样就会频繁的操作CPU->GPU增大开销，从而降低效率。
@@ -43,8 +44,8 @@ import java.nio.FloatBuffer;
  * CSDN:http://blog.csdn.net/yin13753884368/article
  * Github:https://github.com/taxiao213
  */
-public class TXImageRender1 extends TXEglRender {
-    private String TAG = TXImageRender1.this.getClass().getSimpleName();
+public class TXMutiImageRender extends TXEglRender {
+    private String TAG = TXMutiImageRender.this.getClass().getSimpleName();
 
     // 顶点坐标
     private final float[] vertexData = {
@@ -58,15 +59,15 @@ public class TXImageRender1 extends TXEglRender {
     // * FBO离屏渲染的纹理坐标系以左下角为（0，0），左上角（0，1），右上角（1，1），右下角（1，0）
     // * 手机正常的纹理坐标系以左下角为（0，1），左上角（0，0），右上角（1，0），右下角（1，1）
     private final float[] textureData = {
-//            0f, 1f,
-//            1f, 1f,
-//            0f, 0f,
-//            1f, 0f
-
-            0f, 0f,
-            1f, 0f,
             0f, 1f,
-            1f, 1f
+            1f, 1f,
+            0f, 0f,
+            1f, 0f
+
+//            0f, 0f,
+//            1f, 0f,
+//            0f, 1f,
+//            1f, 1f
     };
 
     private Context mContext;
@@ -85,12 +86,14 @@ public class TXImageRender1 extends TXEglRender {
     private float[] mMatrix;
     private float imageWidth;
     private float imageHeight;
+    private int mTextureId;
+    private int mIndex = -1;
     // view 大小
     private int mWidth;
     private int mHeight;
     private OnRenderCreateListener mOnRenderCreateListener;
 
-    public TXImageRender1(Context context, int width, int height) {
+    public TXMutiImageRender(Context context, int width, int height) {
         this.mContext = context;
         this.mWidth = width;
         this.mHeight = height;
@@ -137,12 +140,16 @@ public class TXImageRender1 extends TXEglRender {
                 Matrix.orthoM(mMatrix, 0, -1, 1, -height / ((width * 1.0f / imageWidth) * imageHeight), height / ((width * 1.0f / imageWidth) * imageHeight), -1f, 1f);
             }
         }
+        // 矩阵旋转
+        // 纹理坐标 FBO 离屏绘制和手机正常坐标不同 围绕哪个坐标轴旋转就填1
+        // 参数1: 旋转对象，参数2: 旋转角度，参数3:  x坐标，参数4:  y坐标，参数5:  z坐标
+        Matrix.rotateM(mMatrix, 0, 180, 1, 0, 0);
     }
 
     @Override
     public void onDrawFrame() {
         LogUtils.d(TAG, "onDrawFrame");
-        if (fboRender != null) {
+        if (fboRender != null && textureid != null && textureid.length > 0) {
             // 传递的是纹理
             fboRender.onDrawFrame(textureid[0]);
         }
@@ -154,6 +161,15 @@ public class TXImageRender1 extends TXEglRender {
         // 2.加载 shader 注意需要使用不同的顶点shader
         String vertex = ShaderUtils.readRawTxt(mContext, R.raw.vertex_image_matrix_shader);
         String texture = ShaderUtils.readRawTxt(mContext, R.raw.fragment_image_shader);
+        // 加载不同的纹理
+        if (mIndex == 0) {
+            texture = ShaderUtils.readRawTxt(mContext, R.raw.fragment_image_shader1);
+        } else if (mIndex == 1) {
+            texture = ShaderUtils.readRawTxt(mContext, R.raw.fragment_image_shader2);
+        } else if (mIndex == 2) {
+            texture = ShaderUtils.readRawTxt(mContext, R.raw.fragment_image_shader3);
+        }
+
         // 3.创建渲染程序
         program = ShaderUtils.createProgram(vertex, texture);
         if (program > 0) {
@@ -184,7 +200,9 @@ public class TXImageRender1 extends TXEglRender {
             GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, fbo[0]);
 
             // 5.创建纹理
-            textureid = new int[1];
+            if (textureid == null) {
+                textureid = new int[1];
+            }
             GLES20.glGenTextures(1, textureid, 0);
             if (textureid[0] == 0) {
                 LogUtils.d(TAG, " textureid[0] == 0");
@@ -206,8 +224,8 @@ public class TXImageRender1 extends TXEglRender {
             // 参数1 匹配模式
             // 参数2 纹理层级
             // 参数3 format
-            // 参数4 离屏渲染的宽
-            // 参数5 离屏渲染的高
+            // 参数4 离屏渲染的宽 和 VIEW 的宽相同
+            // 参数5 离屏渲染的高 和 VIEW 的高相同
             // 参数6 历史遗留传0就行
             // 参数7 format
             // 参数8 无符号的byte
@@ -301,5 +319,14 @@ public class TXImageRender1 extends TXEglRender {
 
     public void setOnRenderCreateListener(OnRenderCreateListener onRenderCreateListener) {
         this.mOnRenderCreateListener = onRenderCreateListener;
+    }
+
+    // 加载不同的纹理
+    public void setTextureId(int textureId, int index) {
+        if (textureid == null) {
+            textureid = new int[1];
+        }
+        this.textureid[0] = textureId;
+        this.mIndex = index;
     }
 }

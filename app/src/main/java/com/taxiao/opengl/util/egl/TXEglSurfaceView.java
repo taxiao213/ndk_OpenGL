@@ -67,6 +67,18 @@ public abstract class TXEglSurfaceView extends SurfaceView implements SurfaceHol
         this.mSurface = mSurface;
     }
 
+    public void setSurfaceAndEglContext(Surface surface, EGLContext eglContext) {
+        this.mSurface = surface;
+        this.mEGLContext = eglContext;
+    }
+
+    public EGLContext getEglContext() {
+        if (mTxEglThread != null) {
+            return mTxEglThread.getEglContext();
+        }
+        return null;
+    }
+
     public void requestRender() {
         if (mTxEglThread != null) {
             mTxEglThread.requestRender();

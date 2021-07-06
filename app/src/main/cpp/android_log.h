@@ -12,7 +12,7 @@
 #endif //OPENGL_ANDROID_LOG_H
 
 #define TAG "TAXIAO"
-#define DEBUG 1
+#define DEBUG 0
 
 #if DEBUG
 #define SDK_LOG_V(FORMAT, ...) __android_log_print(ANDROID_LOG_VERBOSE, TAG, "[%s] line: %d info: " FORMAT, __PRETTY_FUNCTION__, __LINE__, ##__VA_ARGS__)

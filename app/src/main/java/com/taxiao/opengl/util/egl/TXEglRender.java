@@ -27,6 +27,6 @@ public class TXEglRender implements TXEglSurfaceView.EglRender {
     public void onDrawFrame() {
         Log.d(TAG, "onDrawFrame");
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
-        GLES20.glClearColor(0f, 1f, 1f, 0f);
+        GLES20.glClearColor(0f, 0f, 0f, 0f);
     }
 }

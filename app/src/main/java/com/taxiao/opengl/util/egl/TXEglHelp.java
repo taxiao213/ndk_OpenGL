@@ -83,8 +83,10 @@ public class TXEglHelp {
         };
 
         if (eglContext != null) {
+            Log.d(TAG, "eglContext != null");
             mEglContext = mEgl.eglCreateContext(mEglDisplay, configs[0], eglContext, attrib_list);
         } else {
+            Log.d(TAG, "eglContext == null");
             mEglContext = mEgl.eglCreateContext(mEglDisplay, configs[0], EGL10.EGL_NO_CONTEXT, attrib_list);
         }
 

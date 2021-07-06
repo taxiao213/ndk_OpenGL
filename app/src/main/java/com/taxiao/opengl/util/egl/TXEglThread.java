@@ -6,6 +6,8 @@ import com.taxiao.opengl.util.LogUtils;
 
 import java.lang.ref.WeakReference;
 
+import javax.microedition.khronos.egl.EGLContext;
+
 /**
  * egl thread
  * Created by hanqq on 2021/6/26
@@ -164,5 +166,12 @@ public class TXEglThread extends Thread {
     public void onDestory() {
         mIsExit = true;
         requestRender();
+    }
+
+    public EGLContext getEglContext() {
+        if (mTXEglHelp != null) {
+            return mTXEglHelp.getmEglContext();
+        }
+        return null;
     }
 }
