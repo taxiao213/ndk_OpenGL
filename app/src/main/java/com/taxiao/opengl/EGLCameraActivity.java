@@ -1,5 +1,6 @@
 package com.taxiao.opengl;
 
+import android.content.res.Configuration;
 import android.graphics.Point;
 import android.graphics.SurfaceTexture;
 import android.os.Bundle;
@@ -7,6 +8,7 @@ import android.view.SurfaceView;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.taxiao.opengl.util.Camera1Utils;
@@ -55,5 +57,13 @@ public class EGLCameraActivity extends AppCompatActivity {
                 }
             }
         });
+    }
+
+    @Override
+    public void onConfigurationChanged(@NonNull Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        if (camera != null) {
+            camera.previewAngle(this);
+        }
     }
 }

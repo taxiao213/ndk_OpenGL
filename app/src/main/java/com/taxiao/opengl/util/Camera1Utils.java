@@ -39,8 +39,8 @@ public class Camera1Utils {
     private Point outPoint = new Point();
     private SurfaceHolder.Callback callback;
     private SurfaceHolder holder;
-
     private HandlerThread mCameraHandler;
+    private int cameraId = Camera.CameraInfo.CAMERA_FACING_BACK;
 
     private Camera1Utils() {
     }
@@ -353,6 +353,7 @@ public class Camera1Utils {
                 cameraID = Camera.CameraInfo.CAMERA_FACING_BACK;
             }
         }
+        cameraId = cameraID;
         return cameraID;
     }
 
@@ -416,4 +417,7 @@ public class Camera1Utils {
         }
     }
 
+    public int getCameraId() {
+        return cameraId;
+    }
 }

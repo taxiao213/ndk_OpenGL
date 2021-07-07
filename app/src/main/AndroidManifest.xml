@@ -6,7 +6,6 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.CAMERA" />
 
-
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -24,7 +23,9 @@
         <activity android:name=".EGLActivity" />
         <activity android:name=".EGLActivity2" />
         <activity android:name=".EGLActivity3" />
-        <activity android:name=".EGLCameraActivity" />
+        <activity
+            android:name=".EGLCameraActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize" />
     </application>
 
 </manifest>

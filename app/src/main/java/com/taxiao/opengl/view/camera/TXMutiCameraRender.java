@@ -8,6 +8,7 @@ import android.opengl.GLUtils;
 import android.opengl.Matrix;
 
 import com.taxiao.opengl.R;
+import com.taxiao.opengl.util.DisplayUtil;
 import com.taxiao.opengl.util.LogUtils;
 import com.taxiao.opengl.util.ShaderUtils;
 import com.taxiao.opengl.util.egl.TXEglRender;
@@ -89,13 +90,16 @@ public class TXMutiCameraRender extends TXEglRender implements SurfaceTexture.On
     // view 大小
     private int mWidth;
     private int mHeight;
+    private int mViewWidth;
+    private int mViewHeight;
     private OnRenderCameraListener mOnRenderCameraListener;
     private SurfaceTexture cameraSurfaceTexture;
 
-    public TXMutiCameraRender(Context context, int width, int height) {
+    public TXMutiCameraRender(Context context) {
+        LogUtils.d(TAG, "TXMutiCameraRender create");
         this.mContext = context;
-        this.mWidth = width;
-        this.mHeight = height;
+        this.mWidth = DisplayUtil.getScreenWidth(context);
+        this.mHeight = DisplayUtil.getScreenHeight(context);
         fboRender = new TXFBORender(context);
         mMatrix = new float[16];
         initMatrix();
@@ -135,19 +139,20 @@ public class TXMutiCameraRender extends TXEglRender implements SurfaceTexture.On
 
     @Override
     public void onSurfaceChanged(int width, int height) {
-        LogUtils.d(TAG, "onSurfaceChanged");
+        LogUtils.d(TAG, String.format("onSurfaceChanged width:%d height:%d ", width, height));
         if (fboRender != null) {
             fboRender.onSurfaceChanged(width, height);
         }
-
+        mViewWidth = width;
+        mViewHeight = height;
         // 矩阵旋转
         // 纹理坐标 FBO 离屏绘制和手机正常坐标不同 围绕哪个坐标轴旋转就填1
         // 参数1: 旋转对象，参数2: 旋转角度，参数3:  x坐标，参数4:  y坐标，参数5:  z坐标
         // camera 先z轴旋转，再y轴对称旋转
-        if (mIndex == -1) {
-            Matrix.rotateM(mMatrix, 0, -90, 0, 0, 1);
-            Matrix.rotateM(mMatrix, 0, 180, 0, 1, 0);
-        }
+//        if (mIndex == -1) {
+//            Matrix.rotateM(mMatrix, 0, -90, 0, 0, 1);
+//            Matrix.rotateM(mMatrix, 0, 180, 0, 1, 0);
+//        }
     }
 
     @Override
@@ -155,6 +160,7 @@ public class TXMutiCameraRender extends TXEglRender implements SurfaceTexture.On
         LogUtils.d(TAG, "onDrawFrame");
         if (fboRender != null && textureid != null && textureid.length > 0) {
             // 传递的是纹理
+            fboRender.onSurfaceChanged(mViewWidth, mViewHeight);
             fboRender.onDrawFrame(textureid[0]);
         }
         renderFrame();
@@ -250,6 +256,7 @@ public class TXMutiCameraRender extends TXEglRender implements SurfaceTexture.On
         if (program > 0) {
             LogUtils.d(TAG, "renderFrame");
             cameraSurfaceTexture.updateTexImage();
+            GLES20.glViewport(0, 0, mWidth, mHeight);
             // 10.使用渲染器
             GLES20.glUseProgram(program);
             GLES20.glUniformMatrix4fv(u_matrix, 1, false, mMatrix, 0);
@@ -318,5 +325,13 @@ public class TXMutiCameraRender extends TXEglRender implements SurfaceTexture.On
     @Override
     public void onFrameAvailable(SurfaceTexture surfaceTexture) {
         LogUtils.d(TAG, "onFrameAvailable Timestamp " + surfaceTexture.getTimestamp() + " cameraSurfaceTexture: " + cameraSurfaceTexture.hashCode());
+    }
+
+    public void resetMatrix() {
+        Matrix.setIdentityM(mMatrix, 0);
+    }
+
+    public void setAngle(float angle, float x, float y, float z) {
+        Matrix.rotateM(mMatrix, 0, angle, x, y, z);
     }
 }
