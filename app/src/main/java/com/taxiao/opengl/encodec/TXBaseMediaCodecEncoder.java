@@ -7,10 +7,12 @@ import android.media.MediaMuxer;
 import android.view.Surface;
 
 import com.taxiao.opengl.util.Constant;
+import com.taxiao.opengl.util.LogUtils;
 import com.taxiao.opengl.util.egl.TXEglRender;
 
 import java.io.IOException;
 import java.lang.ref.WeakReference;
+import java.nio.ByteBuffer;
 
 import javax.microedition.khronos.egl.EGLContext;
 
@@ -23,65 +25,110 @@ import javax.microedition.khronos.egl.EGLContext;
  */
 public abstract class TXBaseMediaCodecEncoder {
 
-    public int mWidth;
-    public int mHeight;
+    private static final String TAG = TXBaseMediaCodecEncoder.class.getSimpleName();
     public Surface mSurface;
     public EGLContext mEglContext;
-    public MediaCodec.BufferInfo mBufferInfo;
-    public MediaMuxer mMediaMuxer;
-    public MediaFormat mMediaFormat;
-    public MediaCodec mEncoder;
     public TXEglRender mTXEglRender;
-    public int mRenderMode = Constant.RENDERMODE_CONTINUOUSLY;
-    public OnMediaInfoListener mOnMediaInfoListener;
+    public MediaMuxer mMediaMuxer;
+    public MediaCodec.BufferInfo mVideoBufferInfo;
+    public MediaFormat mVideoMediaFormat;
+    public MediaCodec mVideoEncoder;
+    public MediaCodec.BufferInfo mAudioBufferInfo;
+    public MediaFormat mAudioMediaFormat;
+    public MediaCodec mAudioEncoder;
     public TXEncodecEglThread mTXEncodecEglThread;
-    public TXEncodecMediaThread mTXEncodecMediaThread;
+    public TXEncodecVideoThread mTXEncodecVideoThread;
+    public TXEncodecAudioThread mTXEncodecAudioThread;
+    public OnMediaInfoListener mOnMediaInfoListener;
+    public int mWidth;
+    public int mHeight;
+    public int mSampleRate;
+    public int mRenderMode = Constant.RENDERMODE_CONTINUOUSLY;
+    public boolean mAudioExit = false;
+    public boolean mVideoExit = false;
+    public boolean mEncodecStart = false;
 
-    public void initEncoder(EGLContext eglContext, String filePath, String mimeType, int width, int height) {
+    public void initEncoder(EGLContext eglContext, String filePath, int width, int height, int sampleRate, int channelCount) {
         this.mEglContext = eglContext;
         this.mWidth = width;
         this.mHeight = height;
-        initMediaCodec(filePath, mimeType, width, height);
-    }
-
-    private void initMediaCodec(String filePath, String mimeType, int width, int height) {
+        this.mSampleRate = sampleRate;
         try {
             mMediaMuxer = new MediaMuxer(filePath, MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4);
-            mBufferInfo = new MediaCodec.BufferInfo();
-            mMediaFormat = MediaFormat.createVideoFormat(mimeType, width, height);
-            mMediaFormat.setInteger(MediaFormat.KEY_COLOR_FORMAT, MediaCodecInfo.CodecCapabilities.COLOR_FormatSurface);
-            mMediaFormat.setInteger(MediaFormat.KEY_BIT_RATE, width * height * 4);
-            mMediaFormat.setInteger(MediaFormat.KEY_FRAME_RATE, 30);
-            mMediaFormat.setInteger(MediaFormat.KEY_I_FRAME_INTERVAL, 1);
-            mEncoder = MediaCodec.createEncoderByType(mimeType);
-            mEncoder.configure(mMediaFormat, null, null, MediaCodec.CONFIGURE_FLAG_ENCODE);
-            mSurface = mEncoder.createInputSurface();
+            initVideoMediaCodec(MediaFormat.MIMETYPE_VIDEO_AVC, width, height);
+            initAudioMediaCodec(MediaFormat.MIMETYPE_AUDIO_AAC, sampleRate, channelCount);
         } catch (IOException e) {
             e.printStackTrace();
             mMediaMuxer = null;
-            mBufferInfo = null;
-            mMediaFormat = null;
-            mEncoder = null;
+            mVideoBufferInfo = null;
+            mVideoMediaFormat = null;
+            mVideoEncoder = null;
+            mAudioBufferInfo = null;
+            mAudioMediaFormat = null;
+            mAudioEncoder = null;
+        }
+    }
+
+    // video 编码
+    private void initVideoMediaCodec(String mimeType, int width, int height) throws IOException {
+        mVideoBufferInfo = new MediaCodec.BufferInfo();
+        mVideoMediaFormat = MediaFormat.createVideoFormat(mimeType, width, height);
+        mVideoMediaFormat.setInteger(MediaFormat.KEY_COLOR_FORMAT, MediaCodecInfo.CodecCapabilities.COLOR_FormatSurface);
+        mVideoMediaFormat.setInteger(MediaFormat.KEY_BIT_RATE, width * height * 4);
+        mVideoMediaFormat.setInteger(MediaFormat.KEY_FRAME_RATE, 30);
+        mVideoMediaFormat.setInteger(MediaFormat.KEY_I_FRAME_INTERVAL, 1);
+        mVideoEncoder = MediaCodec.createEncoderByType(mimeType);
+        mVideoEncoder.configure(mVideoMediaFormat, null, null, MediaCodec.CONFIGURE_FLAG_ENCODE);
+        mSurface = mVideoEncoder.createInputSurface();
+    }
+
+    // audio 编码
+    private void initAudioMediaCodec(String mimeType, int sampleRate, int channelCount) throws IOException {
+        mAudioBufferInfo = new MediaCodec.BufferInfo();
+        mAudioMediaFormat = MediaFormat.createAudioFormat(mimeType, sampleRate, channelCount);
+        mAudioMediaFormat.setInteger(MediaFormat.KEY_BIT_RATE, 96000);
+        mAudioMediaFormat.setInteger(MediaFormat.KEY_AAC_PROFILE, MediaCodecInfo.CodecProfileLevel.AACObjectLD);
+        mAudioMediaFormat.setInteger(MediaFormat.KEY_MAX_INPUT_SIZE, 4096);
+        mAudioEncoder = MediaCodec.createEncoderByType(mimeType);
+        mAudioEncoder.configure(mAudioMediaFormat, null, null, MediaCodec.CONFIGURE_FLAG_ENCODE);
+    }
+
+    // 设置音频数据
+    public void putPCMData(byte[] buffer, int size) {
+        if (mTXEncodecAudioThread != null && !mTXEncodecAudioThread.mIsExit && mAudioEncoder != null && mEncodecStart && buffer != null && size > 0) {
+            int inputBufferindex = mAudioEncoder.dequeueInputBuffer(0);
+            if (inputBufferindex >= 0) {
+                ByteBuffer byteBuffer = mAudioEncoder.getInputBuffers()[inputBufferindex];
+                byteBuffer.clear();
+                byteBuffer.put(buffer);
+                long pts = mTXEncodecAudioThread.getAudioPts(size, mSampleRate);
+                LogUtils.d(TAG, "pts :" + pts);
+                mAudioEncoder.queueInputBuffer(inputBufferindex, 0, size, pts, 0);
+            }
         }
     }
 
     public void startRecord() {
         if (mSurface != null && mEglContext != null) {
             mTXEncodecEglThread = new TXEncodecEglThread(new WeakReference<TXBaseMediaCodecEncoder>(this));
-            mTXEncodecMediaThread = new TXEncodecMediaThread(new WeakReference<TXBaseMediaCodecEncoder>(this));
+            mTXEncodecVideoThread = new TXEncodecVideoThread(new WeakReference<TXBaseMediaCodecEncoder>(this));
+            mTXEncodecAudioThread = new TXEncodecAudioThread(new WeakReference<TXBaseMediaCodecEncoder>(this));
             mTXEncodecEglThread.mIsCreate = true;
             mTXEncodecEglThread.mIsChange = true;
             mTXEncodecEglThread.start();
-            mTXEncodecMediaThread.start();
+            mTXEncodecVideoThread.start();
+            mTXEncodecAudioThread.start();
         }
     }
 
     public void stopRecord() {
-        if (mTXEncodecEglThread != null && mTXEncodecMediaThread != null) {
+        if (mTXEncodecEglThread != null && mTXEncodecVideoThread != null) {
             mTXEncodecEglThread.onDestory();
-            mTXEncodecMediaThread.exit();
+            mTXEncodecVideoThread.exit();
+            mTXEncodecAudioThread.exit();
             mTXEncodecEglThread = null;
-            mTXEncodecMediaThread = null;
+            mTXEncodecVideoThread = null;
+            mTXEncodecAudioThread = null;
         }
     }
 

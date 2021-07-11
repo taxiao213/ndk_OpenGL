@@ -21,6 +21,11 @@ import com.taxiao.opengl.view.camera.OnRenderCameraListener;
 import com.taxiao.opengl.view.camera.TXMutiGLSurfaceCamera;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.function.ToDoubleBiFunction;
 
 
 /**
@@ -33,8 +38,9 @@ import java.io.File;
 public class EGLVideoCameraActivity extends AppCompatActivity {
     private String TAG = EGLVideoCameraActivity.this.getClass().getSimpleName();
     private TXMutiGLSurfaceCamera camera;
-    private String path ;
+    private String path;
     private TXMediaCodecEncoder txMediaCodecEncoder;
+    private ExecutorService executorService;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,7 +51,9 @@ public class EGLVideoCameraActivity extends AppCompatActivity {
         Button bt_pause = findViewById(R.id.bt_pause);
         Button bt_stop = findViewById(R.id.bt_stop);
         File cacheDir = getCacheDir();
-        path=new File(cacheDir,"cache.mp4").getAbsolutePath();
+        path = new File(cacheDir, "cache.mp4").getAbsolutePath();
+
+        executorService = Executors.newSingleThreadExecutor();
         // 渲染camera
         camera.setOnCreate(new OnRenderCameraListener() {
             @Override
@@ -72,14 +80,45 @@ public class EGLVideoCameraActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 txMediaCodecEncoder = new TXMediaCodecEncoder(EGLVideoCameraActivity.this, camera.getTextureID());
-                txMediaCodecEncoder.initEncoder(camera.getEglContext(), path, MediaFormat.MIMETYPE_VIDEO_AVC, 1080, 1920);
+                // 采样率和声道写死
+                txMediaCodecEncoder.initEncoder(camera.getEglContext(), path, 1080, 1920, 44100, 2);
                 txMediaCodecEncoder.setOnMediaInfoListener(new TXBaseMediaCodecEncoder.OnMediaInfoListener() {
                     @Override
                     public void onMediaTime(int times) {
-                        LogUtils.d(TAG, "time is : " + times);
+//                        LogUtils.d(TAG, "time is : " + times);
                     }
                 });
                 txMediaCodecEncoder.startRecord();
+                executorService.execute(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            // TODO: 2021/7/11 读取PCM数据 需要设置休眠
+                            try {
+                                Thread.sleep(1000);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                            // 读取PCM数据
+                            InputStream stream = getResources().getAssets().open("mydream.pcm");
+                            byte[] bytes = new byte[4096];
+                            int size;
+                            int count = 0;
+                            while ((size = stream.read(bytes)) != -1) {
+                                count++;
+                                try {
+                                    Thread.sleep(1000 / 30);
+                                } catch (InterruptedException e) {
+                                    e.printStackTrace();
+                                }
+                                txMediaCodecEncoder.putPCMData(bytes, 4096);
+                            }
+                            LogUtils.d(TAG, "count : " + count);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                });
             }
         });
 
