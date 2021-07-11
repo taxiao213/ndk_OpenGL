@@ -1,12 +1,21 @@
 package com.taxiao.opengl.util;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
 import android.opengl.GLES20;
+import android.opengl.GLUtils;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.nio.ByteBuffer;
+
+import javax.microedition.khronos.opengles.GL;
 
 /**
  * 顶点着色器 和 片元着色器 加载
@@ -55,6 +64,7 @@ public class ShaderUtils {
 
     /**
      * 读取 shader
+     *
      * @param shaderType
      * @param source
      * @return
@@ -113,5 +123,64 @@ public class ShaderUtils {
             }
         }
         return createProgram;
+    }
+
+    /**
+     * canvas 创建bitmap
+     *
+     * @param text
+     * @param textSize
+     * @param textColor
+     * @param bgColor
+     * @param padding
+     * @return
+     */
+    public static Bitmap createTextImage(String text, int textSize, String textColor, String bgColor, int padding) {
+        Paint paint = new Paint();
+        paint.setColor(Color.parseColor(textColor));
+        paint.setTextSize(textSize);
+        paint.setStyle(Paint.Style.FILL);
+        paint.setAntiAlias(true);
+
+        float width = paint.measureText(text, 0, text.length());
+        float top = paint.getFontMetrics().top;
+        float bottom = paint.getFontMetrics().bottom;
+
+        Bitmap bm = Bitmap.createBitmap((int) (width + padding * 2), (int) ((bottom - top) + padding * 2), Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(bm);
+        canvas.drawColor(Color.parseColor(bgColor));
+        canvas.drawText(text, padding, -top + padding, paint);
+        return bm;
+    }
+
+    /**
+     * 加载 Bitmap Texture
+     *
+     * @param bitmap Bitmap
+     * @return
+     */
+    public static int loadBitmapTexture(Bitmap bitmap) {
+        int[] textureid = new int[1];
+        GLES20.glGenTextures(1, textureid, 0);
+        // 6.绑定纹理
+        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, textureid[0]);
+        // 7.设置环绕和过滤方式 环绕（超出纹理坐标范围）：（s==x t==y GL_REPEAT 重复）
+        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_S, GLES20.GL_REPEAT);
+        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_T, GLES20.GL_REPEAT);
+        // 8.过滤（纹理像素映射到坐标点）：（缩小、放大：GL_LINEAR线性）
+        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_LINEAR);
+        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MAG_FILTER, GLES20.GL_LINEAR);
+        ByteBuffer byteBuffer = ByteBuffer.allocateDirect(bitmap.getWidth() * bitmap.getHeight() * 4);
+        bitmap.copyPixelsToBuffer(byteBuffer);
+        byteBuffer.flip();
+        // 9.绑定图片 以下两种方式都可以
+        GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, bitmap, 0);
+//        GLES20.glTexImage2D(GLES20.GL_TEXTURE_2D, 0, GLES20.GL_RGBA, bitmap.getWidth()
+//                , bitmap.getHeight(), 0, GLES20.GL_RGBA, GLES20.GL_UNSIGNED_BYTE, byteBuffer);
+        bitmap.recycle();
+        bitmap = null;
+        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, 0);
+        LogUtils.d(TAG, "bind Bitmap");
+        return textureid[0];
     }
 }

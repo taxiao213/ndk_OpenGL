@@ -83,7 +83,7 @@ public class TXMutiCameraRender extends TXEglRender implements SurfaceTexture.On
     private int[] textureid;
     private int[] fbo;
     private int cameraTexure;
-    private final TXFBORender fboRender;
+    private final TXFBOCameraRender fboRender;
     private int u_matrix;
     private float[] mMatrix;
     private int mIndex = -1;
@@ -100,7 +100,7 @@ public class TXMutiCameraRender extends TXEglRender implements SurfaceTexture.On
         this.mContext = context;
         this.mWidth = DisplayUtil.getScreenWidth(context);
         this.mHeight = DisplayUtil.getScreenHeight(context);
-        fboRender = new TXFBORender(context);
+        fboRender = new TXFBOCameraRender(context);
         mMatrix = new float[16];
         initMatrix();
         // 1.创建顶点 和 纹理 buffer

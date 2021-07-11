@@ -1,4 +1,4 @@
-package com.taxiao.opengl.encodec;
+package com.taxiao.opengl.view.camera;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -7,21 +7,21 @@ import android.opengl.GLES20;
 import com.taxiao.opengl.R;
 import com.taxiao.opengl.util.LogUtils;
 import com.taxiao.opengl.util.ShaderUtils;
-import com.taxiao.opengl.util.egl.TXEglRender;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 
 /**
- * Created by hanqq on 2021/7/10
+ * 离屏渲染
+ * Created by hanqq on 2021/6/27
  * Email:yin13753884368@163.com
  * CSDN:http://blog.csdn.net/yin13753884368/article
  * Github:https://github.com/taxiao213
  */
-public class TXEncodecRender extends TXEglRender {
-    private String TAG = TXEncodecRender.this.getClass().getSimpleName();
-
+public class TXFBOCameraRender {
+    private String TAG = TXFBOCameraRender.this.getClass().getSimpleName();
+    private boolean drawPic = true;
     // 顶点坐标
     private final float[] vertexData = {
             -1f, -1f,
@@ -49,18 +49,14 @@ public class TXEncodecRender extends TXEglRender {
     private int program;
     private int av_position;
     private int af_position;
-    private int s_texture;
-    private int mtextureID;
     private int[] vbo;
     private Bitmap bitmap;
     private int bitmapTexture;
 
-    public TXEncodecRender(Context context, int textureID) {
+    public TXFBOCameraRender(Context context) {
         this.mContext = context;
-        this.mtextureID = textureID;
         bitmap = ShaderUtils.createTextImage("视频录制：他晓", 50, "#ff0000", "#00000000", 10);
 
-        // 确定水印的位置 设置高占比例 0.1f, 算出宽占的比例
         float r = 1.0f * bitmap.getWidth() / bitmap.getHeight();
         float w = r * 0.1f;
 
@@ -90,24 +86,21 @@ public class TXEncodecRender extends TXEglRender {
         textureBuffer.position(0);
     }
 
-    @Override
     public void onSurfaceCreated() {
         LogUtils.d(TAG, "onSurfaceCreated");
-        super.onSurfaceCreated();
         initOpenGLES();
     }
 
-    @Override
     public void onSurfaceChanged(int width, int height) {
         LogUtils.d(TAG, "onSurfaceChanged");
-        super.onSurfaceChanged(width, height);
+        GLES20.glViewport(0, 0, width, height);
     }
 
-    @Override
-    public void onDrawFrame() {
+    public void onDrawFrame(int imageTexure) {
         LogUtils.d(TAG, "onDrawFrame");
-        super.onDrawFrame();
-        renderFrame();
+        GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
+        GLES20.glClearColor(0f, 0f, 1f, 0f);
+        renderFrame(imageTexure);
     }
 
     private void initOpenGLES() {
@@ -121,7 +114,6 @@ public class TXEncodecRender extends TXEglRender {
             // 4.得到着色器中的属性
             av_position = GLES20.glGetAttribLocation(program, "av_Position");
             af_position = GLES20.glGetAttribLocation(program, "af_Position");
-            s_texture = GLES20.glGetUniformLocation(program, "s_texture");
 
             // 使用VBO
             // 4.1 创建VBO
@@ -137,21 +129,20 @@ public class TXEncodecRender extends TXEglRender {
             // 4.5 解绑
             GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, 0);
 
+
             bitmapTexture = ShaderUtils.loadBitmapTexture(bitmap);
         }
     }
 
-    private void renderFrame() {
+    private void renderFrame(int imageTexure) {
         if (program > 0) {
             LogUtils.d(TAG, "renderFrame");
             // 10.使用渲染器
             GLES20.glUseProgram(program);
-            GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, mtextureID);
+            GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, imageTexure);
             GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, vbo[0]);
-
             // 11.使顶点坐标和纹理坐标属性数组有效
             GLES20.glEnableVertexAttribArray(av_position);
-            // 使用VBO 缓存时最后一个参数传0，不使用VBO ,最后一个参数传vertexBuffer
             GLES20.glVertexAttribPointer(av_position, 2, GLES20.GL_FLOAT, false, 8, 0);
 
             GLES20.glEnableVertexAttribArray(af_position);
@@ -166,7 +157,6 @@ public class TXEncodecRender extends TXEglRender {
             GLES20.glEnableVertexAttribArray(af_position);
             GLES20.glVertexAttribPointer(af_position, 2, GLES20.GL_FLOAT, false, 8, vertexData.length * 4);
             GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, 4);
-
             // 解绑
             GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, 0);
             GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, 0);
