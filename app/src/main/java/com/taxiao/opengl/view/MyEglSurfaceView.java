@@ -3,6 +3,7 @@ package com.taxiao.opengl.view;
 import android.content.Context;
 import android.util.AttributeSet;
 
+import com.taxiao.opengl.util.Constant;
 import com.taxiao.opengl.util.egl.TXEglRender;
 import com.taxiao.opengl.util.egl.TXEglSurfaceView;
 import com.taxiao.opengl.util.egl.TXEglThread;
@@ -26,6 +27,6 @@ public class MyEglSurfaceView extends TXEglSurfaceView {
     public MyEglSurfaceView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         setRender(new TXEglRender());
-        setRenderMode(TXEglThread.RENDERMODE_WHEN_DIRTY);
+        setRenderMode(Constant.RENDERMODE_WHEN_DIRTY);
     }
 }

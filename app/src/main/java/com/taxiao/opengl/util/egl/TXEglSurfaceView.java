@@ -9,6 +9,7 @@ import android.view.SurfaceView;
 
 import androidx.annotation.NonNull;
 
+import com.taxiao.opengl.util.Constant;
 import com.taxiao.opengl.util.LogUtils;
 
 import java.lang.ref.WeakReference;
@@ -28,7 +29,7 @@ public abstract class TXEglSurfaceView extends SurfaceView implements SurfaceHol
     public Surface mSurface;
     public EGLContext mEGLContext;
     public TXEglRender mTXEglRender;
-    public int mRenderMode = TXEglThread.RENDERMODE_CONTINUOUSLY;
+    public int mRenderMode = Constant.RENDERMODE_CONTINUOUSLY;
     private TXEglThread mTxEglThread;
 
     public TXEglSurfaceView(Context context) {

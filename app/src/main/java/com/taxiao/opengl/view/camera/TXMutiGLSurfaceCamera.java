@@ -7,6 +7,7 @@ import android.view.Surface;
 import android.view.WindowManager;
 
 import com.taxiao.opengl.util.Camera1Utils;
+import com.taxiao.opengl.util.Constant;
 import com.taxiao.opengl.util.LogUtils;
 import com.taxiao.opengl.util.egl.TXEglSurfaceView;
 import com.taxiao.opengl.util.egl.TXEglThread;
@@ -36,7 +37,7 @@ public class TXMutiGLSurfaceCamera extends TXEglSurfaceView {
     public TXMutiGLSurfaceCamera(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         LogUtils.d(TAG, "create");
-        setRenderMode(TXEglThread.RENDERMODE_CONTINUOUSLY);
+        setRenderMode(Constant.RENDERMODE_CONTINUOUSLY);
         txEglRender = new TXMutiCameraRender(getContext());
         setRender(txEglRender);
         previewAngle(getContext());
@@ -92,5 +93,12 @@ public class TXMutiGLSurfaceCamera extends TXEglSurfaceView {
                 }
                 break;
         }
+    }
+
+    public int getTextureID() {
+        if (txEglRender != null) {
+            return txEglRender.getTextureID();
+        }
+        return -1;
     }
 }

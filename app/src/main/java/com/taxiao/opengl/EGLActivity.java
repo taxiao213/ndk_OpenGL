@@ -52,6 +52,13 @@ public class EGLActivity extends AppCompatActivity {
                 startActivity(new Intent(EGLActivity.this, EGLCameraActivity.class));
             }
         });
+        findViewById(R.id.bt4).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // mediacodec camera
+                startActivity(new Intent(EGLActivity.this, EGLVideoCameraActivity.class));
+            }
+        });
 
         surface.getHolder().addCallback(new SurfaceHolder.Callback() {
             @Override

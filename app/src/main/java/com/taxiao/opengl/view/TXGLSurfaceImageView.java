@@ -6,6 +6,7 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.view.ViewGroup;
 
+import com.taxiao.opengl.util.Constant;
 import com.taxiao.opengl.util.egl.TXEglRender;
 import com.taxiao.opengl.util.egl.TXEglSurfaceView;
 import com.taxiao.opengl.util.egl.TXEglThread;
@@ -37,6 +38,6 @@ public class TXGLSurfaceImageView extends TXEglSurfaceView {
     protected void onSizeChanged(int width, int height, int oldw, int oldh) {
         super.onSizeChanged(width, height, oldw, oldh);
         setRender(new TXImageRender1(getContext(), width, height));
-        setRenderMode(TXEglThread.RENDERMODE_WHEN_DIRTY);
+        setRenderMode(Constant.RENDERMODE_WHEN_DIRTY);
     }
 }

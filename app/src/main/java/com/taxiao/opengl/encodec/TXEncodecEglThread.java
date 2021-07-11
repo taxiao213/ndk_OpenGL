@@ -1,58 +1,50 @@
-package com.taxiao.opengl.util.egl;
+package com.taxiao.opengl.encodec;
 
 import android.util.Log;
 
 import com.taxiao.opengl.util.Constant;
-import com.taxiao.opengl.util.LogUtils;
+import com.taxiao.opengl.util.egl.TXEglHelp;
 
 import java.lang.ref.WeakReference;
 
-import javax.microedition.khronos.egl.EGLContext;
 
 /**
- * egl thread
- * Created by hanqq on 2021/6/26
+ * Created by hanqq on 2021/7/10
  * Email:yin13753884368@163.com
  * CSDN:http://blog.csdn.net/yin13753884368/article
  * Github:https://github.com/taxiao213
  */
-public class TXEglThread extends Thread {
+public class TXEncodecEglThread extends Thread {
+    private static String TAG = TXEncodecEglThread.class.getName();
 
-    private static String TAG = TXEglThread.class.getName();
-    private WeakReference<TXEglSurfaceView> mEglSurfaceViewWeakReference;
+    private WeakReference<TXBaseMediaCodecEncoder> mWeakReference;
     private TXEglHelp mTXEglHelp;
+    private Object mObject;
     public boolean mIsStart;// 开始
     public boolean mIsCreate;// 创建
     public boolean mIsChange;// 改变
     public boolean mIsExit;// 退出
-    private int mWidth;
-    private int mHeight;
-    private Object mObject;
 
-    public TXEglThread(WeakReference<TXEglSurfaceView> eglSurfaceViewWeakReference) {
-        this.mEglSurfaceViewWeakReference = eglSurfaceViewWeakReference;
+    public TXEncodecEglThread(WeakReference<TXBaseMediaCodecEncoder> weakReference) {
+        mWeakReference = weakReference;
     }
 
     @Override
     public void run() {
         super.run();
-        LogUtils.d("time_egl", "time3: " + System.currentTimeMillis());
-        if (mEglSurfaceViewWeakReference == null || mEglSurfaceViewWeakReference.get() == null) {
-            Log.d(TAG, "mEglSurfaceViewWeakReference == null || mEglSurfaceViewWeakReference.get() == null");
-            return;
-        }
-        mIsStart = false;
         mIsExit = false;
+        mIsStart = false;
         mObject = new Object();
         mTXEglHelp = new TXEglHelp();
-        mTXEglHelp.init(mEglSurfaceViewWeakReference.get().mSurface, mEglSurfaceViewWeakReference.get().mEGLContext);
+        mTXEglHelp.init(mWeakReference.get().mSurface, mWeakReference.get().mEglContext);
+
         while (true) {
             Log.d(TAG, String.format("mIsStart: %b , mIsCreate: %b , mIsChange: %b  mIsExit: %b ", mIsStart, mIsCreate, mIsChange, mIsExit));
             onStart();
 
             onCreate();
 
-            onChange();
+            onChange(mWeakReference.get().mWidth, mWeakReference.get().mHeight);
 
             onDraw();
 
@@ -60,7 +52,6 @@ public class TXEglThread extends Thread {
                 release();
                 break;
             }
-
             mIsStart = true;
         }
     }
@@ -68,10 +59,10 @@ public class TXEglThread extends Thread {
     private void onStart() {
         if (mIsStart) {
             Log.d(TAG, "onStart: ");
-            if (mEglSurfaceViewWeakReference == null || mEglSurfaceViewWeakReference.get() == null) {
+            if (mWeakReference == null || mWeakReference.get() == null) {
                 Log.d(TAG, " mIsStart mEglSurfaceViewWeakReference == null || mEglSurfaceViewWeakReference.get() == null");
             }
-            int mRenderMode = mEglSurfaceViewWeakReference.get().mRenderMode;
+            int mRenderMode = mWeakReference.get().mRenderMode;
             Log.d(TAG, "mRenderMode: " + mRenderMode);
             if (mRenderMode == Constant.RENDERMODE_WHEN_DIRTY) {
                 synchronized (mObject) {
@@ -83,7 +74,7 @@ public class TXEglThread extends Thread {
                 }
             } else if (mRenderMode == Constant.RENDERMODE_CONTINUOUSLY) {
                 try {
-                    Thread.sleep(1000 / 30);
+                    Thread.sleep(1000 / 60);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -94,28 +85,28 @@ public class TXEglThread extends Thread {
     }
 
     private void onCreate() {
-        if (mIsCreate && mEglSurfaceViewWeakReference != null && mEglSurfaceViewWeakReference.get() != null && mEglSurfaceViewWeakReference.get().mTXEglRender != null) {
+        if (mIsCreate && mWeakReference != null && mWeakReference.get() != null && mWeakReference.get().mTXEglRender != null) {
             Log.d(TAG, "onCreate");
-            mEglSurfaceViewWeakReference.get().mTXEglRender.onSurfaceCreated();
+            mWeakReference.get().mTXEglRender.onSurfaceCreated();
             mIsCreate = false;
         }
     }
 
-    private void onChange() {
-        if (mIsChange && mEglSurfaceViewWeakReference != null && mEglSurfaceViewWeakReference.get() != null && mEglSurfaceViewWeakReference.get().mTXEglRender != null) {
+    private void onChange(int width, int height) {
+        if (mIsChange && mWeakReference != null && mWeakReference.get() != null && mWeakReference.get().mTXEglRender != null) {
             Log.d(TAG, "onChange");
-            mEglSurfaceViewWeakReference.get().mTXEglRender.onSurfaceChanged(mWidth, mHeight);
+            mWeakReference.get().mTXEglRender.onSurfaceChanged(width, height);
             mIsChange = false;
         }
     }
 
     private void onDraw() {
-        if (mEglSurfaceViewWeakReference != null && mEglSurfaceViewWeakReference.get() != null && mEglSurfaceViewWeakReference.get().mTXEglRender != null && mTXEglHelp != null) {
+        if (mWeakReference != null && mWeakReference.get() != null && mWeakReference.get().mTXEglRender != null && mTXEglHelp != null) {
             Log.d(TAG, "onDraw");
-            mEglSurfaceViewWeakReference.get().mTXEglRender.onDrawFrame();
+            mWeakReference.get().mTXEglRender.onDrawFrame();
             // 解决手动绘制时无法渲染
             if (!mIsStart) {
-                mEglSurfaceViewWeakReference.get().mTXEglRender.onDrawFrame();
+                mWeakReference.get().mTXEglRender.onDrawFrame();
             }
             mTXEglHelp.swapBuffers();
         }
@@ -127,17 +118,9 @@ public class TXEglThread extends Thread {
             mTXEglHelp.destoryEgl();
             mTXEglHelp = null;
             mObject = null;
-            mEglSurfaceViewWeakReference.clear();
-            mEglSurfaceViewWeakReference = null;
+            mWeakReference.clear();
+            mWeakReference = null;
         }
-    }
-
-    public void setWidth(int mWidth) {
-        this.mWidth = mWidth;
-    }
-
-    public void setHeight(int mHeight) {
-        this.mHeight = mHeight;
     }
 
     // 渲染
@@ -153,12 +136,5 @@ public class TXEglThread extends Thread {
     public void onDestory() {
         mIsExit = true;
         requestRender();
-    }
-
-    public EGLContext getEglContext() {
-        if (mTXEglHelp != null) {
-            return mTXEglHelp.getmEglContext();
-        }
-        return null;
     }
 }

@@ -334,4 +334,8 @@ public class TXMutiCameraRender extends TXEglRender implements SurfaceTexture.On
     public void setAngle(float angle, float x, float y, float z) {
         Matrix.rotateM(mMatrix, 0, angle, x, y, z);
     }
+
+    public int getTextureID() {
+        return textureid[0];
+    }
 }

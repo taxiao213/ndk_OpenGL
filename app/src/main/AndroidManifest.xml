@@ -26,6 +26,10 @@
         <activity
             android:name=".EGLCameraActivity"
             android:configChanges="orientation|keyboardHidden|screenSize" />
+
+        <activity
+            android:name=".EGLVideoCameraActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize" />
     </application>
 
 </manifest>

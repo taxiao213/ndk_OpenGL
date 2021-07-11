@@ -3,6 +3,7 @@ package com.taxiao.opengl.view;
 import android.content.Context;
 import android.util.AttributeSet;
 
+import com.taxiao.opengl.util.Constant;
 import com.taxiao.opengl.util.LogUtils;
 import com.taxiao.opengl.util.egl.TXEglSurfaceView;
 import com.taxiao.opengl.util.egl.TXEglThread;
@@ -56,7 +57,7 @@ public class TXMutiGLSurfaceImageView2 extends TXEglSurfaceView {
         LogUtils.d(TAG, String.format("size: width:%d , height:%d ", width, height));
         txEglRender = new TXMutiImageRender2(getContext(), width, height);
         setRender(txEglRender);
-        setRenderMode(TXEglThread.RENDERMODE_WHEN_DIRTY);
+        setRenderMode(Constant.RENDERMODE_WHEN_DIRTY);
         LogUtils.d(TAG, "size: ");
         if (onRenderCreateListener != null) {
             onRenderCreateListener.onCreate(0);
