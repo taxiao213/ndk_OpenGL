@@ -80,7 +80,7 @@ public class EGLVideoCameraActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 txMediaCodecEncoder = new TXMediaCodecEncoder(EGLVideoCameraActivity.this, camera.getTextureID());
-                // 采样率和声道写死
+                // 采样率和声道写死  mydream.pcm 采样率是44100 声道2
                 txMediaCodecEncoder.initEncoder(camera.getEglContext(), path, 1080, 1920, 44100, 2);
                 txMediaCodecEncoder.setOnMediaInfoListener(new TXBaseMediaCodecEncoder.OnMediaInfoListener() {
                     @Override
@@ -99,7 +99,7 @@ public class EGLVideoCameraActivity extends AppCompatActivity {
                             } catch (InterruptedException e) {
                                 e.printStackTrace();
                             }
-                            // 读取PCM数据
+                            // 读取PCM数据 mydream.pcm 采样率是44100 声道2
                             InputStream stream = getResources().getAssets().open("mydream.pcm");
                             byte[] bytes = new byte[4096];
                             int size;
