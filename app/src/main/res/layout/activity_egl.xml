@@ -37,7 +37,7 @@
         android:layout_height="90dp"
         android:layout_marginTop="5dp"
         android:orientation="horizontal"
-        android:weightSum="4">
+        android:weightSum="5">
 
         <Button
             android:id="@+id/bt1"
@@ -68,6 +68,13 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:text="mediacodec camera" />
+
+        <Button
+            android:id="@+id/bt5"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:text="图片生成视频" />
 
     </LinearLayout>
 </LinearLayout>

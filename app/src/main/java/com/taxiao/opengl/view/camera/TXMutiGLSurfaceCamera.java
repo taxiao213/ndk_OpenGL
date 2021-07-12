@@ -36,16 +36,13 @@ public class TXMutiGLSurfaceCamera extends TXEglSurfaceView {
 
     public TXMutiGLSurfaceCamera(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        LogUtils.d(TAG, "create");
         setRenderMode(Constant.RENDERMODE_CONTINUOUSLY);
         txEglRender = new TXMutiCameraRender(getContext());
         setRender(txEglRender);
         previewAngle(getContext());
-        LogUtils.d(TAG, "onSizeChanged: ");
     }
 
     public void setOnCreate(OnRenderCameraListener onRenderCreateListener) {
-        LogUtils.d(TAG, "setOnCreate OnRenderCameraListener : ");
         if (onRenderCreateListener != null) {
             txEglRender.setOnRenderCreateListener(onRenderCreateListener);
         }

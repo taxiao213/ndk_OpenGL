@@ -86,18 +86,22 @@ public class TXEncodecAudioThread extends Thread {
     }
 
     private void release() {
-        if (mEncoder != null) {
-            mEncoder.stop();
-            mEncoder.release();
-            mEncoder = null;
-        }
-        mWeakReference.get().mAudioExit = true;
-        if (mWeakReference.get().mVideoExit) {
-            if (mMediaMuxer != null) {
-                mMediaMuxer.stop();
-                mMediaMuxer.release();
-                mMediaMuxer = null;
+        try {
+            if (mEncoder != null) {
+                mEncoder.stop();
+                mEncoder.release();
+                mEncoder = null;
             }
+            mWeakReference.get().mAudioExit = true;
+            if (mWeakReference.get().mVideoExit) {
+                if (mMediaMuxer != null) {
+                    mMediaMuxer.stop();
+                    mMediaMuxer.release();
+                    mMediaMuxer = null;
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
         LogUtils.d(TAG, "release");
     }
