@@ -201,12 +201,6 @@ public class TXMutiYUVRender extends TXEglRender {
                 GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, 0);
             }
 
-            // 使用FBO
-            // 4.6 创建FBO
-            fbo = new int[1];
-            GLES20.glGenBuffers(1, fbo, 0);
-            GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, fbo[0]);
-
             textureIMGId = new int[1];
             GLES20.glGenTextures(1, textureIMGId, 0);
             GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, textureIMGId[0]);
@@ -215,6 +209,12 @@ public class TXMutiYUVRender extends TXEglRender {
             GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_T, GLES20.GL_REPEAT);
             GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_LINEAR);
             GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MAG_FILTER, GLES20.GL_LINEAR);
+
+            // 使用FBO
+            // 4.6 创建FBO
+            fbo = new int[1];
+            GLES20.glGenBuffers(1, fbo, 0);
+            GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, fbo[0]);
 
             // 参数1 匹配模式
             // 参数2 纹理层级
@@ -331,9 +331,8 @@ public class TXMutiYUVRender extends TXEglRender {
         }
     }
 
-    // todo 共享纹理传值有问题
     public int getTextureID() {
-        return textureYUVid[0];
+        return textureIMGId[0];
     }
 
     public void setFrameData(int w, int h, byte[] by, byte[] bu, byte[] bv) {
