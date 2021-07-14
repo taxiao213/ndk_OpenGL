@@ -138,6 +138,8 @@ public class TXFBOYUVRender {
             LogUtils.d(TAG, "renderFrame");
             // 10.使用渲染器
             GLES20.glUseProgram(program);
+            // TODO: 2021/7/14 YUV数据预览显示异常，需要切换到 GLES20.GL_TEXTURE0
+            GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
             GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, imageTexure);
             GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, vbo[0]);
             // 11.使顶点坐标和纹理坐标属性数组有效

@@ -286,7 +286,6 @@ public class TXMutiYUVRender extends TXEglRender {
             GLES20.glTexImage2D(GLES20.GL_TEXTURE_2D, 0, GLES20.GL_LUMINANCE, w / 2, h / 2, 0, GLES20.GL_LUMINANCE, GLES20.GL_UNSIGNED_BYTE, v);
             GLES20.glUniform1i(sampler_v, 2);
 
-            GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, textureIMGId[0]);
             y.clear();
             u.clear();
             v.clear();
