@@ -18,7 +18,12 @@ public class PermissionsUtils {
     public static final String TAG = PermissionsUtils.class.getSimpleName();
     private static volatile PermissionsUtils mPermissionsUtils;
     private static int REQUEST_CODE = 0X101;
-    private String[] CAMERA_PERMISSION = new String[]{Manifest.permission.CAMERA, Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE};
+    private String[] CAMERA_PERMISSION = new String[]{Manifest.permission.CAMERA,
+            Manifest.permission.READ_EXTERNAL_STORAGE,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE,
+            Manifest.permission.RECORD_AUDIO,
+            Manifest.permission.CAPTURE_AUDIO_OUTPUT,
+            Manifest.permission.MODIFY_AUDIO_SETTINGS};
 
     private PermissionsUtils() {
     }

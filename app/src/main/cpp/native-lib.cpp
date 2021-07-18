@@ -7,6 +7,7 @@
 //#include "matrix/TXMatrix.h"
 
 #include "opengl/TXOpengl.h"
+#include "audio/TXOpenSLES.h"
 
 JavaVM *jvm = NULL;
 ANativeWindow *mANativeWindow = NULL;
@@ -351,4 +352,46 @@ JNIEXPORT void JNICALL
 Java_com_taxiao_opengl_JniSdkImpl_setFilterType(JNIEnv *env, jobject thiz, jint type) {
     // TODO: implement setFilterType()
     filterType = type;
+}
+
+
+// -----------------------opensl es 录音-------------------------------
+
+TXOpenSLES *txOpenSles;
+
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_taxiao_opengl_JniSdkImpl_startRecord(JNIEnv *env, jobject thiz, jstring path) {
+    const char *filePath = env->GetStringUTFChars(path, 0);
+    FILE *pcmFile = fopen(filePath, "w");
+    txOpenSles = new TXOpenSLES();
+    txOpenSles->file = pcmFile;
+    txOpenSles->start();
+    env->ReleaseStringUTFChars(path, filePath);
+}
+
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_taxiao_opengl_JniSdkImpl_pauseRecord(JNIEnv *env, jobject thiz) {
+    if (txOpenSles != NULL) {
+        txOpenSles->pause();
+    }
+}
+
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_taxiao_opengl_JniSdkImpl_resumeRecord(JNIEnv *env, jobject thiz) {
+    if (txOpenSles != NULL) {
+        txOpenSles->resume();
+    }
+}
+
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_taxiao_opengl_JniSdkImpl_stopRecord(JNIEnv *env, jobject thiz) {
+    if (txOpenSles != NULL) {
+        txOpenSles->stop();
+        delete txOpenSles;
+        txOpenSles = NULL;
+    }
 }

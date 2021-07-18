@@ -94,7 +94,7 @@ int TXEglHelp::initEgl(EGLNativeWindowType windowType) {
         return -1;
     }
 
-    SDK_LOG_D("egl init success! ");
+    SDK_LOG_D("egl createEngine success! ");
     return 0;
 }
 

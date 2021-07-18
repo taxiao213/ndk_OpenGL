@@ -41,4 +41,13 @@ public class JniSdkImpl {
     public native void setYUVData(byte[] yuv_y, byte[] yuv_u, byte[] yuv_v, int width, int height);
 
     public native void setFilterType(int type);
+
+    public native void startRecord(String absolutePath);
+
+    public native void pauseRecord();
+
+    public native void resumeRecord();
+
+    public native void stopRecord();
+
 }

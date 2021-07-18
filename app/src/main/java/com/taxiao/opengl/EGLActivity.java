@@ -10,6 +10,7 @@ import android.view.View;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.taxiao.opengl.record.RecordActivity;
 import com.taxiao.opengl.util.egl.TXEglHelp;
 import com.taxiao.opengl.view.MyEglSurfaceView;
 import com.taxiao.opengl.view.TXGLSurfaceImageView;
@@ -74,6 +75,13 @@ public class EGLActivity extends AppCompatActivity {
                 startActivity(new Intent(EGLActivity.this, EGLYUVActivity.class));
             }
         });
+        findViewById(R.id.bt11).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // mediacodec camera
+                startActivity(new Intent(EGLActivity.this, RecordActivity.class));
+            }
+        });
         surface.getHolder().addCallback(new SurfaceHolder.Callback() {
             @Override
             public void surfaceCreated(@NonNull final SurfaceHolder holder) {
@@ -88,7 +96,7 @@ public class EGLActivity extends AppCompatActivity {
 //                    @Override
 //                    public void run() {
 //                        TXEglHelp txeglHelp = new TXEglHelp();
-//                        txeglHelp.init(holder.getSurface(), null);
+//                        txeglHelp.createEngine(holder.getSurface(), null);
 //                        while (true) {
 //                            GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
 //                            GLES20.glClearColor(1f, 0f, 0f, 0f);

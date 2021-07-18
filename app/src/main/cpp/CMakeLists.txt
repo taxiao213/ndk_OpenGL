@@ -13,6 +13,8 @@ add_library(
         opengl/TXOpenglFilterOne.cpp
         opengl/TXOpenglFilterTwo.cpp
         opengl/TXOpenglFilterYUV.cpp
+        audio/TXOpenSLES.cpp
+        audio/TXRecordBuffer.cpp
         )
 
 
@@ -21,4 +23,5 @@ target_link_libraries(
         EGL
         GLESv2
         android
+        OpenSLES
         log)

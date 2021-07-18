@@ -26,7 +26,7 @@ public class TXEglHelp {
     private EGLSurface mEglSurface;
 
     public void init(Surface surface, EGLContext eglContext) {
-        Log.d(TAG, "init");
+        Log.d(TAG, "createEngine");
         // 1.Get an EGL instance
         mEgl = (EGL10) EGLContext.getEGL();
 
