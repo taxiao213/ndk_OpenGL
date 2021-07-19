@@ -21,6 +21,8 @@ add_library(
         rtmp/log.c
         rtmp/parseurl.c
         rtmp/rtmp.c
+        rtmp/RtmpPush.cpp
+        rtmp/RtmpQueue.cpp
 )
 
 

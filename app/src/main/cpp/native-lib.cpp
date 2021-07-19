@@ -8,6 +8,7 @@
 
 #include "opengl/TXOpengl.h"
 #include "audio/TXOpenSLES.h"
+#include "rtmp/RtmpPush.h"
 
 JavaVM *jvm = NULL;
 ANativeWindow *mANativeWindow = NULL;
@@ -394,4 +395,13 @@ Java_com_taxiao_opengl_JniSdkImpl_stopRecord(JNIEnv *env, jobject thiz) {
         delete txOpenSles;
         txOpenSles = NULL;
     }
+}
+
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_taxiao_opengl_JniSdkImpl_initRtmp(JNIEnv *env, jobject thiz, jstring url) {
+    const char *pushUrl = env->GetStringUTFChars(url, 0);
+    RtmpPush *rtmp = new RtmpPush(pushUrl);
+    rtmp->create();
+    env->ReleaseStringUTFChars(url, pushUrl);
 }

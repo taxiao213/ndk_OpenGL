@@ -50,4 +50,6 @@ public class JniSdkImpl {
 
     public native void stopRecord();
 
+    public native void initRtmp(String url);
+
 }

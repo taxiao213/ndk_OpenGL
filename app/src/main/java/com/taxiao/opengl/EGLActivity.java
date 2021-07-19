@@ -11,6 +11,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.taxiao.opengl.record.RecordActivity;
+import com.taxiao.opengl.rtmp.RtmpActivity;
 import com.taxiao.opengl.util.egl.TXEglHelp;
 import com.taxiao.opengl.view.MyEglSurfaceView;
 import com.taxiao.opengl.view.TXGLSurfaceImageView;
@@ -80,6 +81,13 @@ public class EGLActivity extends AppCompatActivity {
             public void onClick(View v) {
                 // mediacodec camera
                 startActivity(new Intent(EGLActivity.this, RecordActivity.class));
+            }
+        });
+        findViewById(R.id.bt12).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // mediacodec camera
+                startActivity(new Intent(EGLActivity.this, RtmpActivity.class));
             }
         });
         surface.getHolder().addCallback(new SurfaceHolder.Callback() {
