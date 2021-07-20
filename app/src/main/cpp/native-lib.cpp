@@ -9,6 +9,7 @@
 #include "opengl/TXOpengl.h"
 #include "audio/TXOpenSLES.h"
 #include "rtmp/RtmpPush.h"
+#include "callback/TXCallBack.h"
 
 JavaVM *jvm = NULL;
 ANativeWindow *mANativeWindow = NULL;
@@ -26,6 +27,7 @@ int imageHeight;
 float matrix[16];
 TXOpengl *txOpengl = NULL;
 int filterType;
+TXCallBack *txCallBack = NULL;
 
 // 获取 jvm
 JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *javaVm, void *reserved) {
@@ -36,6 +38,10 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *javaVm, void *reserved) {
     }
     SDK_LOG_D("Jni_OnLoad");
     return JNI_VERSION_1_4;
+}
+
+JNIEXPORT jint JNICALL JNI_OnUnLoad(JavaVM *javaVm, void *reserved) {
+    jvm = NULL;
 }
 
 extern "C"
@@ -401,7 +407,8 @@ extern "C"
 JNIEXPORT void JNICALL
 Java_com_taxiao_opengl_JniSdkImpl_initRtmp(JNIEnv *env, jobject thiz, jstring url) {
     const char *pushUrl = env->GetStringUTFChars(url, 0);
-    RtmpPush *rtmp = new RtmpPush(pushUrl);
+    txCallBack = new TXCallBack(jvm, env, &thiz);
+    RtmpPush *rtmp = new RtmpPush(pushUrl, txCallBack);
     rtmp->create();
     env->ReleaseStringUTFChars(url, pushUrl);
 }

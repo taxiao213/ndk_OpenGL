@@ -7,7 +7,8 @@
 
 #include "RtmpPush.h"
 
-RtmpPush::RtmpPush(const char *urlPath) {
+RtmpPush::RtmpPush(const char *urlPath, TXCallBack *txCallBack) {
+    this->txCallBack = txCallBack;
     this->url = static_cast<char *>(malloc(512));
     strcpy(this->url, urlPath);
     this->rtmpQueue = new RtmpQueue();
@@ -19,6 +20,7 @@ RtmpPush::~RtmpPush() {
         rtmpQueue->clearQueue();
     }
     free(this->url);
+    txCallBack = NULL;
 }
 
 void *callBackPush(void *data) {
@@ -36,13 +38,23 @@ void *callBackPush(void *data) {
     // 链接服务器
     if (!RTMP_Connect(rtmpPush->rtmp, NULL)) {
         SDK_LOG_D("can not connect the url");
+        if (rtmpPush->txCallBack != NULL) {
+            rtmpPush->txCallBack->onFail(THREAD_CHILD, "can not connect the url");
+        }
         goto end;
     }
     if (!RTMP_ConnectStream(rtmpPush->rtmp, 0)) {
         SDK_LOG_D("can not connect the stream of service");
+        if (rtmpPush->txCallBack != NULL) {
+            rtmpPush->txCallBack->onFail(THREAD_CHILD, "can not connect the stream of service");
+        }
         goto end;
     }
     SDK_LOG_D("链接成功， 开始推流");
+    if (rtmpPush->txCallBack != NULL) {
+        rtmpPush->txCallBack->onSuccess(THREAD_CHILD);
+    }
+
     end:
     RTMP_Close(rtmpPush->rtmp);
     RTMP_Free(rtmpPush->rtmp);

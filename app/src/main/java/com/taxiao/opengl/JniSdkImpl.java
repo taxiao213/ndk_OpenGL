@@ -2,6 +2,8 @@ package com.taxiao.opengl;
 
 import android.view.Surface;
 
+import com.taxiao.opengl.rtmp.TXConnectListenr;
+
 /**
  * jni 交互
  * Created by hanqq on 2021/6/12
@@ -12,6 +14,30 @@ import android.view.Surface;
 public class JniSdkImpl {
     static {
         System.loadLibrary("native-lib");
+    }
+
+    private TXConnectListenr txConnectListenr;
+
+    public void setTxConnectListenr(TXConnectListenr txConnectListenr) {
+        this.txConnectListenr = txConnectListenr;
+    }
+
+    private void onConnecting() {
+        if (txConnectListenr != null) {
+            txConnectListenr.onConnecting();
+        }
+    }
+
+    private void onConnectSuccess() {
+        if (txConnectListenr != null) {
+            txConnectListenr.onConnectSuccess();
+        }
+    }
+
+    private void onConnectFial(String msg) {
+        if (txConnectListenr != null) {
+            txConnectListenr.onConnectFail(msg);
+        }
     }
 
     /**

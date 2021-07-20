@@ -23,6 +23,7 @@ add_library(
         rtmp/rtmp.c
         rtmp/RtmpPush.cpp
         rtmp/RtmpQueue.cpp
+        callback/TXCallBack.cpp
 )
 
 

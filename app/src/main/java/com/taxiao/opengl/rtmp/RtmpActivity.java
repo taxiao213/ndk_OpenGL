@@ -2,12 +2,14 @@ package com.taxiao.opengl.rtmp;
 
 import android.os.Bundle;
 import android.view.View;
+import android.widget.TextView;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.taxiao.opengl.JniSdkImpl;
 import com.taxiao.opengl.R;
+import com.taxiao.opengl.util.LogUtils;
 
 import java.io.File;
 
@@ -19,13 +21,18 @@ import java.io.File;
  */
 public class RtmpActivity extends AppCompatActivity {
 
+    private static final String TAG = RtmpActivity.class.getSimpleName();
+
     private JniSdkImpl jniSdk;
-    private String url="rtmp://172.21.0.158/myapp/mystream";
+    private String url = "rtmp://172.21.0.158/myapp/mystream";
+    private TextView textView;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_rtmp);
+        textView = findViewById(R.id.tv_callback);
+
         jniSdk = new JniSdkImpl();
 
         findViewById(R.id.bt1).setOnClickListener(new View.OnClickListener() {
@@ -57,6 +64,41 @@ public class RtmpActivity extends AppCompatActivity {
             public void onClick(View v) {
                 // 停止录音
 
+            }
+        });
+
+        jniSdk.setTxConnectListenr(new TXConnectListenr() {
+            @Override
+            public void onConnecting() {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        LogUtils.d(TAG, "onConnecting");
+                        textView.setText("onConnecting");
+                    }
+                });
+            }
+
+            @Override
+            public void onConnectSuccess() {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        LogUtils.d(TAG, "onConnectSuccess");
+                        textView.setText("onConnectSuccess");
+                    }
+                });
+            }
+
+            @Override
+            public void onConnectFail(String msg) {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        LogUtils.d(TAG, "onConnectFail");
+                        textView.setText("onConnectFail");
+                    }
+                });
             }
         });
     }

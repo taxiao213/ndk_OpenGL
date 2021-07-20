@@ -12,6 +12,7 @@
 #include "../android_log.h"
 #include "RtmpQueue.h"
 #include "pthread.h"
+#include "../callback/TXCallBack.h"
 
 extern "C" {
 #include "rtmp.h"
@@ -24,9 +25,9 @@ public:
     char *url = NULL;
     RtmpQueue *rtmpQueue = NULL;
     pthread_t pushThread;
-
+    TXCallBack *txCallBack;
 public:
-    RtmpPush(const char *urlPath);
+    RtmpPush(const char *urlPath, TXCallBack *txCallBack);
 
     ~RtmpPush();
 
