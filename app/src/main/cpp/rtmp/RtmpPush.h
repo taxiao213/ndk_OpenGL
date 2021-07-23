@@ -26,6 +26,8 @@ public:
     RtmpQueue *rtmpQueue = NULL;
     pthread_t pushThread;
     TXCallBack *txCallBack;
+    long startTime = 0;
+    bool startPushing = false;
 public:
     RtmpPush(const char *urlPath, TXCallBack *txCallBack);
 
@@ -33,7 +35,15 @@ public:
 
     void create();
 
+    void stop();
+
     void destroy();
+
+    void pushSPSPPS(char *sps, int sps_len, char *pps, int pps_len);
+
+    void pushVideoData(char *data, int data_len, bool keyframe);
+
+    void pushAudioData(char *data, int i);
 };
 
 

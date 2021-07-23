@@ -28,6 +28,7 @@ float matrix[16];
 TXOpengl *txOpengl = NULL;
 int filterType;
 TXCallBack *txCallBack = NULL;
+RtmpPush *rtmp;
 
 // 获取 jvm
 JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *javaVm, void *reserved) {
@@ -408,7 +409,43 @@ JNIEXPORT void JNICALL
 Java_com_taxiao_opengl_JniSdkImpl_initRtmp(JNIEnv *env, jobject thiz, jstring url) {
     const char *pushUrl = env->GetStringUTFChars(url, 0);
     txCallBack = new TXCallBack(jvm, env, &thiz);
-    RtmpPush *rtmp = new RtmpPush(pushUrl, txCallBack);
+    rtmp = new RtmpPush(pushUrl, txCallBack);
     rtmp->create();
     env->ReleaseStringUTFChars(url, pushUrl);
+}
+
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_taxiao_opengl_JniSdkImpl_pushSPSPPS(JNIEnv *env, jobject thiz, jbyteArray sps,
+                                             jint sps_len, jbyteArray pps, jint pps_len) {
+    jbyte *_sps = env->GetByteArrayElements(sps, 0);
+    jbyte *_pps = env->GetByteArrayElements(pps, 0);
+    if (rtmp != NULL) {
+        rtmp->pushSPSPPS(reinterpret_cast<char *>(_sps), sps_len, reinterpret_cast<char *>(_pps),
+                         pps_len);
+    }
+    env->ReleaseByteArrayElements(sps, _sps, 0);
+    env->ReleaseByteArrayElements(pps, _pps, 0);
+}
+
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_taxiao_opengl_JniSdkImpl_pushVideoData(JNIEnv *env, jobject thiz, jbyteArray data,
+                                                jint data_len, jboolean keyframe) {
+    jbyte *_data = env->GetByteArrayElements(data, 0);
+    if (rtmp != NULL) {
+        rtmp->pushVideoData(reinterpret_cast<char *>(_data), data_len, keyframe);
+    }
+    env->ReleaseByteArrayElements(data, _data, 0);
+}
+
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_taxiao_opengl_JniSdkImpl_pushAudioData(JNIEnv *env, jobject thiz, jbyteArray data,
+                                                jint data_len) {
+    jbyte *_data = env->GetByteArrayElements(data, 0);
+    if (rtmp != NULL) {
+        rtmp->pushAudioData(reinterpret_cast<char *>(_data), data_len);
+    }
+    env->ReleaseByteArrayElements(data, _data, 0);
 }

@@ -15,7 +15,7 @@ TXCallBack::TXCallBack(JavaVM *javaVm, JNIEnv *jniEnv, jobject *job) {
     jclass pJclass = jniEnv->GetObjectClass(_job);
     jmid_connecting = _jniEnv->GetMethodID(pJclass, "onConnecting", "()V");
     jmid_connectsuccess = _jniEnv->GetMethodID(pJclass, "onConnectSuccess", "()V");
-    jmid_connectfail = _jniEnv->GetMethodID(pJclass, "onConnectFial", "(Ljava/lang/String;)V");
+    jmid_connectfail = _jniEnv->GetMethodID(pJclass, "onConnectFail", "(Ljava/lang/String;)V");
 }
 
 TXCallBack::~TXCallBack() {

@@ -41,7 +41,9 @@ int RtmpQueue::putRtmpPacket(RTMPPacket *rtmpPacket) {
 }
 
 void RtmpQueue::notifyQueue() {
-
+    pthread_mutex_lock(&pthreadMutex);
+    pthread_cond_signal(&pthreadCond);
+    pthread_mutex_unlock(&pthreadMutex);
 }
 
 void RtmpQueue::clearQueue() {
