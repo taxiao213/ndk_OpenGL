@@ -1,7 +1,6 @@
 package com.taxiao.opengl;
 
 import android.content.Intent;
-import android.opengl.GLES20;
 import android.os.Bundle;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -12,11 +11,8 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.taxiao.opengl.record.RecordActivity;
 import com.taxiao.opengl.rtmp.RtmpActivity;
-import com.taxiao.opengl.util.egl.TXEglHelp;
 import com.taxiao.opengl.view.MyEglSurfaceView;
 import com.taxiao.opengl.view.TXGLSurfaceImageView;
-
-import java.util.concurrent.Executors;
 
 /**
  * Created by hanqq on 2021/6/12

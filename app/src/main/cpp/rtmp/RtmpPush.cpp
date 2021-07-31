@@ -156,9 +156,9 @@ void RtmpPush::pushVideoData(char *data, int data_len, bool keyframe) {
     //data : h264裸数据
     int i = 0;
     if (keyframe) {
-        body[i++] = 17;
+        body[i++] = 0x17;
     } else {
-        body[i++] = 27;
+        body[i++] = 0x27;
     }
     body[i++] = 0x01;
     body[i++] = 0x00;
@@ -180,6 +180,7 @@ void RtmpPush::pushVideoData(char *data, int data_len, bool keyframe) {
 }
 
 void RtmpPush::pushAudioData(char *data, int data_len) {
+    SDK_LOG_D("pushAudioData");
     RTMPPacket *rtmpPacket = static_cast<RTMPPacket *>(malloc(sizeof(RTMPPacket)));
     int bodysize = data_len + 2;
     RTMPPacket_Alloc(rtmpPacket, bodysize);

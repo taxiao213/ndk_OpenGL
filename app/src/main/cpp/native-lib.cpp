@@ -449,3 +449,17 @@ Java_com_taxiao_opengl_JniSdkImpl_pushAudioData(JNIEnv *env, jobject thiz, jbyte
     }
     env->ReleaseByteArrayElements(data, _data, 0);
 }
+
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_taxiao_opengl_JniSdkImpl_stopPush(JNIEnv *env, jobject thiz) {
+    if (rtmp != NULL) {
+        rtmp->stop();
+        delete (rtmp);
+        rtmp = NULL;
+    }
+    if (txCallBack != NULL) {
+        delete (txCallBack);
+        txCallBack = NULL;
+    }
+}

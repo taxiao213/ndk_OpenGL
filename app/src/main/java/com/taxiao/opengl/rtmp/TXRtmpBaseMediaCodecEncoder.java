@@ -6,9 +6,6 @@ import android.media.MediaFormat;
 import android.media.MediaMuxer;
 import android.view.Surface;
 
-import com.taxiao.opengl.encodec.TXEncodecAudioThread;
-import com.taxiao.opengl.encodec.TXEncodecEglThread;
-import com.taxiao.opengl.encodec.TXEncodecVideoThread;
 import com.taxiao.opengl.util.Constant;
 import com.taxiao.opengl.util.LogUtils;
 import com.taxiao.opengl.util.egl.TXEglRender;
@@ -32,7 +29,6 @@ public abstract class TXRtmpBaseMediaCodecEncoder {
     public Surface mSurface;
     public EGLContext mEglContext;
     public TXEglRender mTXEglRender;
-    public MediaMuxer mMediaMuxer;
     public MediaCodec.BufferInfo mVideoBufferInfo;
     public MediaFormat mVideoMediaFormat;
     public MediaCodec mVideoEncoder;
@@ -50,19 +46,19 @@ public abstract class TXRtmpBaseMediaCodecEncoder {
     public boolean mAudioExit = false;
     public boolean mVideoExit = false;
     public boolean mEncodecStart = false;
+    private TXAudioRecordUitl mTXAudioRecordUitl;
 
-    public void initEncoder(EGLContext eglContext, String filePath, int width, int height, int sampleRate, int channelCount) {
+    public void initEncoder(EGLContext eglContext,  int width, int height, int sampleRate, int channelCount) {
         this.mEglContext = eglContext;
         this.mWidth = width;
         this.mHeight = height;
         this.mSampleRate = sampleRate;
         try {
-            mMediaMuxer = new MediaMuxer(filePath, MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4);
             initVideoMediaCodec(MediaFormat.MIMETYPE_VIDEO_AVC, width, height);
             initAudioMediaCodec(MediaFormat.MIMETYPE_AUDIO_AAC, sampleRate, channelCount);
+            initPCMRecord();
         } catch (IOException e) {
             e.printStackTrace();
-            mMediaMuxer = null;
             mVideoBufferInfo = null;
             mVideoMediaFormat = null;
             mVideoEncoder = null;
@@ -91,9 +87,21 @@ public abstract class TXRtmpBaseMediaCodecEncoder {
         mAudioMediaFormat = MediaFormat.createAudioFormat(mimeType, sampleRate, channelCount);
         mAudioMediaFormat.setInteger(MediaFormat.KEY_BIT_RATE, 96000);
         mAudioMediaFormat.setInteger(MediaFormat.KEY_AAC_PROFILE, MediaCodecInfo.CodecProfileLevel.AACObjectLD);
-        mAudioMediaFormat.setInteger(MediaFormat.KEY_MAX_INPUT_SIZE, 4096);
+        mAudioMediaFormat.setInteger(MediaFormat.KEY_MAX_INPUT_SIZE, 4096 * 10);
         mAudioEncoder = MediaCodec.createEncoderByType(mimeType);
         mAudioEncoder.configure(mAudioMediaFormat, null, null, MediaCodec.CONFIGURE_FLAG_ENCODE);
+    }
+
+    private void initPCMRecord() {
+        mTXAudioRecordUitl = new TXAudioRecordUitl();
+        mTXAudioRecordUitl.setOnRecordLisener(new TXAudioRecordUitl.OnRecordLisener() {
+            @Override
+            public void recordByte(byte[] audioData, int readSize) {
+                if (mTXAudioRecordUitl.isStart()) {
+                    putPCMData(audioData, readSize);
+                }
+            }
+        });
     }
 
     // 设置音频数据
@@ -102,6 +110,10 @@ public abstract class TXRtmpBaseMediaCodecEncoder {
             int inputBufferindex = mAudioEncoder.dequeueInputBuffer(0);
             if (inputBufferindex >= 0) {
                 ByteBuffer byteBuffer = mAudioEncoder.getInputBuffers()[inputBufferindex];
+                if (byteBuffer.position() == byteBuffer.capacity()) {
+                    return;
+                }
+                LogUtils.d(TAG, "position :" + byteBuffer.position() + " capacity:" + byteBuffer.capacity() + " buffer:" + buffer.length);
                 byteBuffer.clear();
                 byteBuffer.put(buffer);
                 long pts = mTXEncodecAudioThread.getAudioPts(size, mSampleRate);
@@ -122,6 +134,9 @@ public abstract class TXRtmpBaseMediaCodecEncoder {
             mTXEncodecVideoThread.start();
             mTXEncodecAudioThread.start();
         }
+        if (mTXAudioRecordUitl != null) {
+            mTXAudioRecordUitl.startRecord();
+        }
     }
 
     public void stopRecord() {
@@ -132,6 +147,9 @@ public abstract class TXRtmpBaseMediaCodecEncoder {
             mTXEncodecEglThread = null;
             mTXEncodecVideoThread = null;
             mTXEncodecAudioThread = null;
+        }
+        if (mTXAudioRecordUitl != null) {
+            mTXAudioRecordUitl.stopRecord();
         }
     }
 

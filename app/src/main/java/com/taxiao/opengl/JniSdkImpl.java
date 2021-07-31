@@ -52,7 +52,7 @@ public class JniSdkImpl {
         }
     }
 
-public void pushAudioData(byte[] data) {
+    public void pushAudioData(byte[] data) {
         if (data != null) {
             pushAudioData(data, data.length);
         }
@@ -101,4 +101,6 @@ public void pushAudioData(byte[] data) {
     private native void pushVideoData(byte[] data, int data_len, boolean keyframe);
 
     private native void pushAudioData(byte[] data, int data_len);
+
+    public native void stopPush();
 }

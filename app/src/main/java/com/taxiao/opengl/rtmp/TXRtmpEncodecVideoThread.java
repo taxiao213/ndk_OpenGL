@@ -25,7 +25,6 @@ public class TXRtmpEncodecVideoThread extends Thread {
     private MediaFormat mMediaFormat;
     private MediaCodec.BufferInfo mBufferInfo;
     private MediaMuxer mMediaMuxer;
-    public int mVideoTrackIndex;
     private long mPts;// 帧数
     public boolean mIsExit;// 退出
     private byte[] sps;
@@ -41,9 +40,7 @@ public class TXRtmpEncodecVideoThread extends Thread {
         mEncoder = mWeakReference.get().mVideoEncoder;
         mMediaFormat = mWeakReference.get().mVideoMediaFormat;
         mBufferInfo = mWeakReference.get().mVideoBufferInfo;
-        mMediaMuxer = mWeakReference.get().mMediaMuxer;
         mPts = 0;
-        mVideoTrackIndex = -1;
         mIsExit = false;
         mEncoder.start();
         while (true) {
@@ -60,7 +57,6 @@ public class TXRtmpEncodecVideoThread extends Thread {
             int dequeueOutputBufferIndex = mEncoder.dequeueOutputBuffer(mBufferInfo, 0);
             if (dequeueOutputBufferIndex == MediaCodec.INFO_OUTPUT_FORMAT_CHANGED) {
                 // 添加视频轨道
-                mVideoTrackIndex = mMediaMuxer.addTrack(mEncoder.getOutputFormat());
                 if (mWeakReference.get().mTXEncodecAudioThread.mAudioTrackIndex != -1) {
                     mMediaMuxer.start();
                     mWeakReference.get().mEncodecStart = true;
@@ -96,7 +92,7 @@ public class TXRtmpEncodecVideoThread extends Thread {
                             isKeyFrame = true;
                             mWeakReference.get().mOnMediaInfoListener.onSPSPPSInfo(sps, pps);
                         }
-                        mMediaMuxer.writeSampleData(mVideoTrackIndex, outputBuffer, mBufferInfo);
+
                         if (mWeakReference.get().mOnMediaInfoListener != null) {
                             mWeakReference.get().mOnMediaInfoListener.onMediaTime((int) (mBufferInfo.presentationTimeUs / 1000000));
                             // 发送数据

@@ -22,9 +22,7 @@ public class TXRtmpEncodecAudioThread extends Thread {
 
     private WeakReference<TXRtmpBaseMediaCodecEncoder> mWeakReference;
     private MediaCodec mEncoder;
-    private MediaFormat mMediaFormat;
     private MediaCodec.BufferInfo mBufferInfo;
-    private MediaMuxer mMediaMuxer;
     public int mAudioTrackIndex;
     private long mPts;// 帧数
     public boolean mIsExit;// 退出
@@ -37,9 +35,7 @@ public class TXRtmpEncodecAudioThread extends Thread {
     public void run() {
         super.run();
         mEncoder = mWeakReference.get().mAudioEncoder;
-        mMediaFormat = mWeakReference.get().mAudioMediaFormat;
         mBufferInfo = mWeakReference.get().mAudioBufferInfo;
-        mMediaMuxer = mWeakReference.get().mMediaMuxer;
         mPts = 0;
         mAudioTrackIndex = -1;
         mIsExit = false;
@@ -55,14 +51,11 @@ public class TXRtmpEncodecAudioThread extends Thread {
 
     private void encoder() {
         if (mEncoder != null) {
+            LogUtils.d(TAG, "audio encoder");
             int dequeueOutputBufferIndex = mEncoder.dequeueOutputBuffer(mBufferInfo, 0);
             if (dequeueOutputBufferIndex == MediaCodec.INFO_OUTPUT_FORMAT_CHANGED) {
                 // 添加视频轨道
-                mAudioTrackIndex = mMediaMuxer.addTrack(mEncoder.getOutputFormat());
-                if (mWeakReference.get().mTXEncodecVideoThread.mVideoTrackIndex != -1) {
-                    mMediaMuxer.start();
-                    mWeakReference.get().mEncodecStart = true;
-                }
+                mWeakReference.get().mEncodecStart = true;
             } else {
                 while (dequeueOutputBufferIndex >= 0) {
                     if (mWeakReference.get().mEncodecStart) {
@@ -73,12 +66,12 @@ public class TXRtmpEncodecAudioThread extends Thread {
                             mPts = mBufferInfo.presentationTimeUs;
                         }
                         mBufferInfo.presentationTimeUs = mBufferInfo.presentationTimeUs - mPts;
+
                         byte[] data = new byte[outputBuffer.remaining()];
                         outputBuffer.get(data, 0, data.length);
                         if (mWeakReference.get().mOnMediaInfoListener != null) {
                             mWeakReference.get().mOnMediaInfoListener.onAudioInfo(data);
                         }
-                        mMediaMuxer.writeSampleData(mAudioTrackIndex, outputBuffer, mBufferInfo);
                     }
                     mEncoder.releaseOutputBuffer(dequeueOutputBufferIndex, false);
                     dequeueOutputBufferIndex = mEncoder.dequeueOutputBuffer(mBufferInfo, 0);
@@ -99,13 +92,6 @@ public class TXRtmpEncodecAudioThread extends Thread {
                 mEncoder = null;
             }
             mWeakReference.get().mAudioExit = true;
-            if (mWeakReference.get().mVideoExit) {
-                if (mMediaMuxer != null) {
-                    mMediaMuxer.stop();
-                    mMediaMuxer.release();
-                    mMediaMuxer = null;
-                }
-            }
         } catch (Exception e) {
             e.printStackTrace();
         }
