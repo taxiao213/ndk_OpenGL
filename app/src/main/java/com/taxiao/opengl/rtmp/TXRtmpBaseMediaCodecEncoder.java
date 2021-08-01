@@ -3,7 +3,6 @@ package com.taxiao.opengl.rtmp;
 import android.media.MediaCodec;
 import android.media.MediaCodecInfo;
 import android.media.MediaFormat;
-import android.media.MediaMuxer;
 import android.view.Surface;
 
 import com.taxiao.opengl.util.Constant;
@@ -46,7 +45,7 @@ public abstract class TXRtmpBaseMediaCodecEncoder {
     public boolean mAudioExit = false;
     public boolean mVideoExit = false;
     public boolean mEncodecStart = false;
-    private TXAudioRecordUitl mTXAudioRecordUitl;
+    private AudioRecordUtils mAudioRecordUitl;
 
     public void initEncoder(EGLContext eglContext,  int width, int height, int sampleRate, int channelCount) {
         this.mEglContext = eglContext;
@@ -93,15 +92,7 @@ public abstract class TXRtmpBaseMediaCodecEncoder {
     }
 
     private void initPCMRecord() {
-        mTXAudioRecordUitl = new TXAudioRecordUitl();
-        mTXAudioRecordUitl.setOnRecordLisener(new TXAudioRecordUitl.OnRecordLisener() {
-            @Override
-            public void recordByte(byte[] audioData, int readSize) {
-                if (mTXAudioRecordUitl.isStart()) {
-                    putPCMData(audioData, readSize);
-                }
-            }
-        });
+        mAudioRecordUitl =   AudioRecordUtils.getInstance();
     }
 
     // 设置音频数据
@@ -134,8 +125,15 @@ public abstract class TXRtmpBaseMediaCodecEncoder {
             mTXEncodecVideoThread.start();
             mTXEncodecAudioThread.start();
         }
-        if (mTXAudioRecordUitl != null) {
-            mTXAudioRecordUitl.startRecord();
+        if (mAudioRecordUitl != null) {
+            mAudioRecordUitl.startAudioRecord(new AudioRecordUtils.IAudioRecordInterface() {
+                @Override
+                public void putAudioData(byte[] data, int readSize) {
+                    if (mAudioRecordUitl.isStart()) {
+                        putPCMData(data, readSize);
+                    }
+                }
+            });
         }
     }
 
@@ -148,8 +146,8 @@ public abstract class TXRtmpBaseMediaCodecEncoder {
             mTXEncodecVideoThread = null;
             mTXEncodecAudioThread = null;
         }
-        if (mTXAudioRecordUitl != null) {
-            mTXAudioRecordUitl.stopRecord();
+        if (mAudioRecordUitl != null) {
+            mAudioRecordUitl.stopRecord();
         }
     }
 

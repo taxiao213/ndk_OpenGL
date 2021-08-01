@@ -85,36 +85,6 @@ public class RtmpActivity extends AppCompatActivity {
                     }
                 });
                 txMediaCodecEncoder.startRecord();
-//                executorService.execute(new Runnable() {
-//                    @Override
-//                    public void run() {
-//                        try {
-//                            // TODO: 2021/7/11 读取PCM数据 需要设置休眠
-//                            try {
-//                                Thread.sleep(1000);
-//                            } catch (InterruptedException e) {
-//                                e.printStackTrace();
-//                            }
-//                            // 读取PCM数据 mydream.pcm 采样率是44100 声道2
-//                            InputStream stream = getResources().getAssets().open("mydream.pcm");
-//                            byte[] bytes = new byte[4096];
-//                            int size;
-//                            int count = 0;
-//                            while ((size = stream.read(bytes)) != -1) {
-//                                count++;
-//                                try {
-//                                    Thread.sleep(1000 / 30);
-//                                } catch (InterruptedException e) {
-//                                    e.printStackTrace();
-//                                }
-//                                txMediaCodecEncoder.putPCMData(bytes, 4096);
-//                            }
-//                            LogUtils.d(TAG, "count : " + count);
-//                        } catch (IOException e) {
-//                            e.printStackTrace();
-//                        }
-//                    }
-//                });
             }
         });
 
