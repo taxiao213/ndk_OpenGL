@@ -102,8 +102,8 @@ public class AudioRecordUtils {
                         mAudioRecordInterface.putAudioData(cacheBuffer, size);
                     }
                     try {
-                        LogUtils.d(TAG,"putaudio data");
-                        outputStream.write(cacheBuffer,0,size);
+                        LogUtils.d(TAG, "putaudio data");
+                        outputStream.write(cacheBuffer, 0, size);
                         outputStream.flush();
                     } catch (IOException e) {
                         e.printStackTrace();

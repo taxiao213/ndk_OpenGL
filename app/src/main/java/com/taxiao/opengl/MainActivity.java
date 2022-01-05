@@ -11,6 +11,9 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.taxiao.opengl.egl.EGLProjectActivity;
+
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
@@ -35,6 +38,14 @@ public class MainActivity extends AppCompatActivity {
         TXSurfaceView3 surface3 = findViewById(R.id.surface3);
         Button button1 = findViewById(R.id.bt1);
         Button button2 = findViewById(R.id.bt2);
+        Button button3 = findViewById(R.id.bt3);
+        Button button4 = findViewById(R.id.bt4);
+        Button button5 = findViewById(R.id.bt5);
+        Button button6 = findViewById(R.id.bt6);
+        Button button7 = findViewById(R.id.bt7);
+        Button button8 = findViewById(R.id.bt8);
+        Button button9 = findViewById(R.id.bt9);
+        Button button10 = findViewById(R.id.bt10);
         final JniSdkImpl jniSdk = new JniSdkImpl();
 //        surface.setJniSdkImpl(jniSdk);
 //        surface2.setJniSdkImpl(jniSdk);
@@ -52,6 +63,85 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        button3.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // 棒球-三角形
+                Intent intent = new Intent(MainActivity.this, EGLProjectActivity.class);
+                intent.putExtra("action", 1);
+                startActivity(intent);
+            }
+        });
+
+        button4.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // 棒球-三角形扇
+                Intent intent = new Intent(MainActivity.this, EGLProjectActivity.class);
+                intent.putExtra("action", 2);
+                startActivity(intent);
+            }
+        });
+
+        button5.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // 棒球-三角形扇-混色
+                Intent intent = new Intent(MainActivity.this, EGLProjectActivity.class);
+                intent.putExtra("action", 3);
+                startActivity(intent);
+            }
+        });
+
+        button6.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // 棒球-三角形扇-混色
+                Intent intent = new Intent(MainActivity.this, EGLProjectActivity.class);
+                intent.putExtra("action", 4);
+                startActivity(intent);
+            }
+        });
+
+        button7.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // 棒球-三角形扇-混色
+                Intent intent = new Intent(MainActivity.this, EGLProjectActivity.class);
+                intent.putExtra("action", 5);
+                startActivity(intent);
+            }
+        });
+
+        button8.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // 棒球-三角形扇-混色
+                Intent intent = new Intent(MainActivity.this, EGLProjectActivity.class);
+                intent.putExtra("action", 6);
+                startActivity(intent);
+            }
+        });
+
+        button9.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // 棒球-三角形扇-混色
+                Intent intent = new Intent(MainActivity.this, EGLProjectActivity.class);
+                intent.putExtra("action", 7);
+                startActivity(intent);
+            }
+        });
+
+        button10.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // 棒球-三角形扇-混色
+                Intent intent = new Intent(MainActivity.this, EGLProjectActivity.class);
+                intent.putExtra("action", 8);
+                startActivity(intent);
+            }
+        });
         surface3.setJniSdkImpl(jniSdk, new TXSurfaceView3.ISurfaceInterface() {
             @Override
             public void init() {
@@ -63,6 +153,8 @@ public class MainActivity extends AppCompatActivity {
                         int height = 720;
                         // yuv 数据渲染
                         String filePath = "/storage/9016-4EF8/ble2.yuv";
+                        File file = new File(filePath);
+                        if (!file.exists()) return;
                         try {
                             InputStream inputStream = new FileInputStream(filePath);
                             byte[] yuv_y = new byte[width * height];

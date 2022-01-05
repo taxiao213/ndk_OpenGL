@@ -8,6 +8,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.opengl.GLES20;
 import android.opengl.GLUtils;
+import android.util.Log;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -27,6 +28,7 @@ import javax.microedition.khronos.opengles.GL;
 public class ShaderUtils {
 
     private static String TAG = "ShaderUtils";
+    private static boolean LOG_ON = true;
 
     /**
      * 将着色器文件加载成 String 类型
@@ -97,6 +99,7 @@ public class ShaderUtils {
      * @return
      */
     public static int createProgram(String vertexSource, String fragmentSource) {
+        LogUtils.d(TAG, "createProgram init");
         int vertexShader = loadShader(GLES20.GL_VERTEX_SHADER, vertexSource);
         if (vertexShader == 0) {
             return 0;
@@ -105,6 +108,7 @@ public class ShaderUtils {
         if (fragmentShader == 0) {
             return 0;
         }
+        LogUtils.d(TAG, "createProgram vertexShader: " + vertexShader + " ,fragmentShader: " + fragmentShader);
         // 5.创建渲染程序
         int createProgram = GLES20.glCreateProgram();
         if (createProgram != 0) {
@@ -122,7 +126,24 @@ public class ShaderUtils {
                 createProgram = 0;
             }
         }
+        if (LOG_ON) {
+            validateProgream(createProgram);
+        }
         return createProgram;
+    }
+
+    /**
+     * 验证 Progream
+     *
+     * @param progreamID
+     * @return
+     */
+    public static boolean validateProgream(int progreamID) {
+        GLES20.glValidateProgram(progreamID);
+        int[] status = new int[1];
+        GLES20.glGetProgramiv(progreamID, GLES20.GL_VALIDATE_STATUS, status, 0);
+        LogUtils.d(TAG, "Result : " + status[0] + " log: " + GLES20.glGetProgramInfoLog(progreamID));
+        return status[0] != 0;
     }
 
     /**
@@ -203,4 +224,5 @@ public class ShaderUtils {
         return textureIds[0];
 
     }
+
 }
