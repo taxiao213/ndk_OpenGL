@@ -45,12 +45,12 @@ public class SecondOpenGLRender implements GLSurfaceView.Renderer {
     float[] tableVertices = {
 
             // 三角形扇
-            -0.5f, 0.5f,
+            0f, 0f,
             -0.5f, -0.5f,
             0.5f, -0.5f,
-            -0.5f, 0.5f,
-            0.5f, -0.5f,
             0.5f, 0.5f,
+            -0.5f, 0.5f,
+            -0.5f, -0.5f,
 
             // line1
             -0.5f, 0f,
@@ -122,15 +122,15 @@ public class SecondOpenGLRender implements GLSurfaceView.Renderer {
             // int first, 从开头开始读取
             // int count， 读入6个顶点，每个三角形三个顶点，最终画出两个三角形
             glDrawArrays(GL_TRIANGLE_FAN, 0, 6);
-            // 画红线，需要两个点
+            // 画红线，需要两个点 uColorLocation 设置颜色
             // (-0.5f, 0f,) (0.5f, 0f,)
             glUniform4f(uColorLocation, 1.0f, 0.0f, 0.0f, 1.0f);
             glDrawArrays(GL_LINES, 6, 2);
-            // 画木槌 1个点 blue
+            // 画木槌 1个点 blue uColorLocation 设置颜色
             // (0f, -0.25f,)
             glUniform4f(uColorLocation, 0.0f, 0.0f, 1.0f, 1.0f);
             glDrawArrays(GL_POINTS, 8, 1);
-            // 画木槌 1个点 red
+            // 画木槌 1个点 red uColorLocation 设置颜色
             // (0f, 0.25f)
             glUniform4f(uColorLocation, 1.0f, 0.0f, 0.0f, 1.0f);
             glDrawArrays(GL_POINTS, 9, 1);

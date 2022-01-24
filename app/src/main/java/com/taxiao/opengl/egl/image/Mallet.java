@@ -19,27 +19,32 @@ public class Mallet {
 
     private static final float[] VERTEX_DATA = {
             // x,y,r,g,b
-            0F, -0.4F, 0F, 0F,1F,
-            0F, 0.4F, 1F, 0F,0F
+            0F, -0.4F, 1F, 0F, 0F,
+            0F, 0.4F, 1F, 0F, 0F
     };
 
     private VertexArray vertexArray;
+    private int colorUniformLocation;
 
     public Mallet() {
         vertexArray = new VertexArray(VERTEX_DATA);
     }
 
-    public void bindData(ColorShaderProgram textureShaderProgram) {
+    public void bindData(ColorShaderProgram colorShaderProgram) {
         vertexArray.setVertexAttribPointer(0,
-                textureShaderProgram.getPositionAttributeLocation(),
+                colorShaderProgram.getPositionAttributeLocation(),
                 POSITION_COMPONENT_COUNT, STRIDE);
 
         vertexArray.setVertexAttribPointer(POSITION_COMPONENT_COUNT,
-                textureShaderProgram.getColorAttributeLocation(),
+                colorShaderProgram.getColorAttributeLocation(),
                 COLOR_COMPONENT_COUNT, STRIDE);
+
+        colorUniformLocation = colorShaderProgram.getColorUniformLocation();
     }
 
     public void draw() {
-        GLES20.glDrawArrays(GLES20.GL_TRIANGLE_FAN, 0, 2);
+        // 设置颜色
+        GLES20.glUniform4f(colorUniformLocation,1f,0f,0f,1f);
+        GLES20.glDrawArrays(GLES20.GL_POINTS, 0, 2);
     }
 }

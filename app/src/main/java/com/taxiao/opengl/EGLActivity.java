@@ -86,6 +86,20 @@ public class EGLActivity extends AppCompatActivity {
                 startActivity(new Intent(EGLActivity.this, RtmpActivity.class));
             }
         });
+        findViewById(R.id.bt13).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // FreeType
+                startActivity(new Intent(EGLActivity.this, EGLFreeTypeActivity.class));
+            }
+        });
+        findViewById(R.id.bt14).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // FreeType
+                startActivity(new Intent(EGLActivity.this, EGLActivity4.class));
+            }
+        });
         surface.getHolder().addCallback(new SurfaceHolder.Callback() {
             @Override
             public void surfaceCreated(@NonNull final SurfaceHolder holder) {

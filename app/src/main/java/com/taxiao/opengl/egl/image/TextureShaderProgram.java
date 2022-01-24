@@ -6,6 +6,7 @@ import android.opengl.GLES20;
 import com.taxiao.opengl.R;
 
 /**
+ * 顶点坐标
  * Created by hanqq on 2022/1/5
  * Email:yin13753884368@163.com
  * CSDN:http://blog.csdn.net/yin13753884368/article

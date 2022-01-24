@@ -108,6 +108,20 @@
             android:layout_weight="1"
             android:text="trmp 推流" />
 
+        <Button
+            android:id="@+id/bt13"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_marginRight="5dp"
+            android:layout_weight="1"
+            android:text="freetype" />
 
+        <Button
+            android:id="@+id/bt14"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_marginRight="5dp"
+            android:layout_weight="1"
+            android:text="frame" />
     </LinearLayout>
 </LinearLayout>

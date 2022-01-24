@@ -14,6 +14,7 @@ import com.taxiao.opengl.R;
 public class ColorShaderProgram extends ShaderProgram {
     private int aPositionLocation;
     private int aColorLocation;
+    private int uColorLocation;
     private int uMatrixLocation;
 
     public ColorShaderProgram(Context context, int vetexShaderResourceId, int fragmentShaderResourceId) {
@@ -21,10 +22,11 @@ public class ColorShaderProgram extends ShaderProgram {
     }
 
     public ColorShaderProgram(Context context) {
-        super(context, R.raw.simple_image_fragment_shader2, R.raw.simple_image_vertex_shader2);
+        super(context, R.raw.simple_image_vertex_shader2, R.raw.simple_image_fragment_shader2);
         aPositionLocation = GLES20.glGetAttribLocation(program, A_POSITION);
         aColorLocation = GLES20.glGetAttribLocation(program, A_COLOR);
         uMatrixLocation = GLES20.glGetUniformLocation(program, U_MATRIX);
+        uColorLocation = GLES20.glGetUniformLocation(program, U_COLOR);
     }
 
     public void setUniform(float[] matrix) {
@@ -39,5 +41,10 @@ public class ColorShaderProgram extends ShaderProgram {
     public int getColorAttributeLocation() {
 
         return aColorLocation;
+    }
+
+    public int getColorUniformLocation() {
+
+        return uColorLocation;
     }
 }

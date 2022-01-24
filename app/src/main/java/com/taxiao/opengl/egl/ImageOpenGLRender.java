@@ -67,7 +67,7 @@ public class ImageOpenGLRender implements GLSurfaceView.Renderer {
         mallet = new Mallet();
         textureShaderProgram = new TextureShaderProgram(mContext);
         colorShaderProgram = new ColorShaderProgram(mContext);
-        texture = TextureHelper.loadTexture(mContext, R.mipmap.img_111);
+        texture = TextureHelper.loadTexture(mContext, R.mipmap.img_444);
     }
 
     @Override

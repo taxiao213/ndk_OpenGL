@@ -5,5 +5,5 @@ uniform mat4 u_Matrix;
 void main() {
     v_Color = a_Color;
     gl_Position = u_Matrix * a_Position;
-    gl_PointSize = 10.0;
+    gl_PointSize = 20.0;
 }

@@ -59,6 +59,9 @@ public class EGLProjectActivity extends Activity {
                 case 8:
                     renderer = new ImageOpenGLRender(mContext);
                     break;
+                case 9:
+                    renderer = new ImageOpenGLRender2(mContext);
+                    break;
                 default:
                     renderer = new FirstOpenGLRender(mContext);
                     break;
