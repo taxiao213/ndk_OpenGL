@@ -1,22 +1,22 @@
 package com.taxiao.opengl.egl;
 
 import android.content.Context;
+import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 import android.opengl.Matrix;
 
 import com.taxiao.opengl.R;
-import com.taxiao.opengl.egl.image.Table;
-import com.taxiao.opengl.egl.image.TextureShaderProgram;
 import com.taxiao.opengl.egl.obj.ColorShaderProgram2;
 import com.taxiao.opengl.egl.obj.Mallet2;
 import com.taxiao.opengl.egl.obj.Puck;
+import com.taxiao.opengl.egl.obj.Table2;
+import com.taxiao.opengl.egl.obj.TextureShaderProgram2;
 import com.taxiao.opengl.util.LogUtils;
 import com.taxiao.opengl.util.TextureHelper;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
-import static android.opengl.GLES20.glClearColor;
 import static android.opengl.GLES20.glViewport;
 
 /**
@@ -29,20 +29,21 @@ import static android.opengl.GLES20.glViewport;
  * CSDN:http://blog.csdn.net/yin13753884368/article
  * Github:https://github.com/taxiao213
  */
-public class ImageOpenGLRender2 implements GLSurfaceView.Renderer {
+public class ImageOpenGLRender2 extends BaseRenderImp {
     private String TAG = this.getClass().getSimpleName();
     private Context mContext;
-    private float[] projectMatrix = new float[16];
-    private float[] modelMatrix = new float[16];
 
+    private float[] projectionMatrix = new float[16];
+    private float[] modelMatrix = new float[16];
     private float[] viewMatrix = new float[16];
     private float[] viewProjectMatrix = new float[16];
     private float[] modelViewProjectMatrix = new float[16];
-    private Table table;
+
+    private Table2 table;
     private Mallet2 mallet;
     private Puck puck;
-    private TextureShaderProgram textureShaderProgram;
-    private ColorShaderProgram2 colorShaderProgram;
+    private TextureShaderProgram2 textureProgram;
+    private ColorShaderProgram2 colorProgram;
     private int texture;
 
     public ImageOpenGLRender2(Context context) {
@@ -51,13 +52,12 @@ public class ImageOpenGLRender2 implements GLSurfaceView.Renderer {
 
     @Override
     public void onSurfaceCreated(GL10 gl, EGLConfig config) {
-        glClearColor(0.0f, 0f, 0f, 0.0f);
-        table = new Table();
+        table = new Table2();
         mallet = new Mallet2(0.08f, 0.15f, 32);
         puck = new Puck(0.06f, 0.02f, 32);
-        textureShaderProgram = new TextureShaderProgram(mContext);
-        colorShaderProgram = new ColorShaderProgram2(mContext);
-        texture = TextureHelper.loadTexture(mContext, R.mipmap.img_444);
+        textureProgram = new TextureShaderProgram2(mContext);
+        colorProgram = new ColorShaderProgram2(mContext);
+        texture = TextureHelper.loadTexture(mContext, R.mipmap.air_hockey_surface);
     }
 
     @Override
@@ -65,7 +65,7 @@ public class ImageOpenGLRender2 implements GLSurfaceView.Renderer {
         LogUtils.d(TAG, " onSurfaceChanged,width: " + width + " ,height: " + height);
         glViewport(0, 0, width, height);
         // 创建投影矩阵
-        Matrix.perspectiveM(projectMatrix, 0, 45, (float) width / height, 1f, 10f);
+        Matrix.perspectiveM(projectionMatrix, 0, 45, (float) width / height, 1f, 10f);
         // 设置视口 把眼睛eye 设为（0,1.2,2.2），意味着眼睛的位置在x-z平面上方1.2个单位，并向后2.2个单位，换句话说，场景的所有东西都在你下面1.2个单位和你前面2.2个单位地方
         // 中心设为（0,0,0）意味着你将向下看你前面的原点，并把指向up设为（0,1,0），意味着你的头是笔直指向上面的
         Matrix.setLookAtM(viewMatrix, 0, 0f, 1.2f, 2.2f, 0f, 0f, 0f, 0f, 1f, 0f);
@@ -84,35 +84,32 @@ public class ImageOpenGLRender2 implements GLSurfaceView.Renderer {
     @Override
     public void onDrawFrame(GL10 gl) {
         LogUtils.d(TAG, " onDrawFrame ");
-        Matrix.multiplyMM(viewProjectMatrix, 0, projectMatrix, 0, viewMatrix, 0);
+        GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
+        Matrix.multiplyMM(viewProjectMatrix, 0, projectionMatrix, 0, viewMatrix, 0);
+
+        // draw table
         positionTableInScene();
-        textureShaderProgram.useProgram();
-        textureShaderProgram.setUniform(modelViewProjectMatrix, texture);
-        table.bindData(textureShaderProgram);
+        textureProgram.useProgram();
+        textureProgram.setUniform(modelViewProjectMatrix, texture);
+        table.bindData(textureProgram);
         table.draw();
 
         // draw mallet
         positionObjectInScene(0f, mallet.height / 2f, -0.4f);
-        colorShaderProgram.useProgram();
-        colorShaderProgram.setUniform(modelViewProjectMatrix, 1f, 0f, 0f);
-        mallet.bindData(colorShaderProgram);
+        colorProgram.useProgram();
+        colorProgram.setUniform(modelViewProjectMatrix, 1f, 0f, 0f);
+        mallet.bindData(colorProgram);
         mallet.draw();
 
         positionObjectInScene(0f, mallet.height / 2f, 0.4f);
-        colorShaderProgram.setUniform(modelViewProjectMatrix, 0f, 0f, 1f);
+        colorProgram.setUniform(modelViewProjectMatrix, 0f, 0f, 1f);
         mallet.draw();
 
         // draw puck
         positionObjectInScene(0f, puck.height / 2f, 0f);
-        colorShaderProgram.setUniform(modelViewProjectMatrix, 0.8f, 0.8f, 1f);
-        puck.bindData(colorShaderProgram);
+        colorProgram.setUniform(modelViewProjectMatrix, 0.8f, 0.8f, 1f);
+        puck.bindData(colorProgram);
         puck.draw();
-    }
-
-    private void positionObjectInScene(float x, float y, float z) {
-        Matrix.setIdentityM(modelMatrix, 0);
-        Matrix.rotateM(modelMatrix, 0, 0f, x, y, z);
-        Matrix.multiplyMM(modelViewProjectMatrix, 0, viewProjectMatrix, 0, modelMatrix, 0);
     }
 
     private void positionTableInScene() {
@@ -120,5 +117,12 @@ public class ImageOpenGLRender2 implements GLSurfaceView.Renderer {
         Matrix.rotateM(modelMatrix, 0, -90f, 1f, 0f, 0f);
         Matrix.multiplyMM(modelViewProjectMatrix, 0, viewProjectMatrix, 0, modelMatrix, 0);
     }
+
+    private void positionObjectInScene(float x, float y, float z) {
+        Matrix.setIdentityM(modelMatrix, 0);
+        Matrix.translateM(modelMatrix, 0, x, y, z);
+        Matrix.multiplyMM(modelViewProjectMatrix, 0, viewProjectMatrix, 0, modelMatrix, 0);
+    }
+
 
 }

@@ -45,7 +45,7 @@ import static android.opengl.GLES20.glViewport;
  * CSDN:http://blog.csdn.net/yin13753884368/article
  * Github:https://github.com/taxiao213
  */
-public class ImageOpenGLRender implements GLSurfaceView.Renderer {
+public class ImageOpenGLRender extends BaseRenderImp {
     private String TAG = this.getClass().getSimpleName();
     private Context mContext;
     private float[] projectMatrix = new float[16];
@@ -103,5 +103,5 @@ public class ImageOpenGLRender implements GLSurfaceView.Renderer {
 
     }
 
-    ;
+
 }

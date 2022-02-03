@@ -134,6 +134,12 @@
             android:id="@+id/bt11"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="图片纹理2" />
+            android:text="木槌和冰球" />
+
+        <Button
+            android:id="@+id/bt12"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="3D木槌和冰球" />
     </LinearLayout>
 </LinearLayout>

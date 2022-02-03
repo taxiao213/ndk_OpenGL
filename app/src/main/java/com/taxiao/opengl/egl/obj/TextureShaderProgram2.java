@@ -1,9 +1,13 @@
-package com.taxiao.opengl.egl.image;
+package com.taxiao.opengl.egl.obj;
 
 import android.content.Context;
 import android.opengl.GLES20;
 
 import com.taxiao.opengl.R;
+import com.taxiao.opengl.egl.image.ShaderProgram;
+
+import static android.opengl.GLES20.glGetAttribLocation;
+import static android.opengl.GLES20.glGetUniformLocation;
 
 /**
  * 顶点坐标
@@ -12,20 +16,22 @@ import com.taxiao.opengl.R;
  * CSDN:http://blog.csdn.net/yin13753884368/article
  * Github:https://github.com/taxiao213
  */
-public class TextureShaderProgram extends ShaderProgram {
-    private int aPositionLoaction;
-    private int aTextureCoodinateLocation;
+public class TextureShaderProgram2 extends ShaderProgram2 {
+    private int aPositionLocation;
+    private int aTextureCoordinatesLocation;
 
     private int uMatrixLocation;
     private int uTextureUnitLocation;
 
-    public TextureShaderProgram(Context context) {
+    public TextureShaderProgram2(Context context) {
         super(context, R.raw.simple_image_vertex_shader, R.raw.simple_image_fragment_shader);
-        uMatrixLocation = GLES20.glGetUniformLocation(program, U_MATRIX);
-        uTextureUnitLocation = GLES20.glGetUniformLocation(program, U_TEXTURE_UNIT);
+        uMatrixLocation = glGetUniformLocation(program, U_MATRIX);
+        uTextureUnitLocation = glGetUniformLocation(program,
+                U_TEXTURE_UNIT);
 
-        aPositionLoaction = GLES20.glGetAttribLocation(program, A_POSITION);
-        aTextureCoodinateLocation = GLES20.glGetAttribLocation(program, A_TEXTURE_COORDINATES);
+        // Retrieve attribute locations for the shader program.
+        aPositionLocation = glGetAttribLocation(program, A_POSITION);
+        aTextureCoordinatesLocation = glGetAttribLocation(program, A_TEXTURE_COORDINATES);
     }
 
     public void setUniform(float[] matrix, int textureId) {
@@ -37,11 +43,11 @@ public class TextureShaderProgram extends ShaderProgram {
 
     public int getPositionAttributeLocation() {
 
-        return aPositionLoaction;
+        return aPositionLocation;
     }
 
     public int getTextureCoordinateAttributeLocation() {
 
-        return aTextureCoodinateLocation;
+        return aTextureCoordinatesLocation;
     }
 }

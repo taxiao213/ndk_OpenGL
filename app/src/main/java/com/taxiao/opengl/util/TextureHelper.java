@@ -49,9 +49,9 @@ public class TextureHelper {
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         // 加载位图数据到OpenGL
         GLUtils.texImage2D(GL_TEXTURE_2D, 0, bitmap, 0);
-        bitmap.recycle();
         // 生成MIP贴图
         glGenerateMipmap(GL_TEXTURE_2D);
+        bitmap.recycle();
         // 解绑
         glBindTexture(GL_TEXTURE_2D, 0);
         return textureObjectIds[0];

@@ -49,6 +49,15 @@
         <activity
             android:name=".rtmp.RtmpActivity"
             android:configChanges="orientation|keyboardHidden|screenSize" />
+        <activity
+            android:name=".EGLFreeTypeActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize" />
+        <activity
+            android:name=".EGLActivity4"
+            android:configChanges="orientation|keyboardHidden|screenSize" />
+        <activity
+            android:name=".egl.EGLProjectActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize" />
     </application>
 
 </manifest>

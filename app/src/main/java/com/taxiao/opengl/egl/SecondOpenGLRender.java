@@ -39,7 +39,7 @@ import static android.opengl.GLES20.glViewport;
  * CSDN:http://blog.csdn.net/yin13753884368/article
  * Github:https://github.com/taxiao213
  */
-public class SecondOpenGLRender implements GLSurfaceView.Renderer {
+public class SecondOpenGLRender extends BaseRenderImp {
     private String TAG = this.getClass().getSimpleName();
     // 坐标归一化
     float[] tableVertices = {
@@ -136,4 +136,5 @@ public class SecondOpenGLRender implements GLSurfaceView.Renderer {
             glDrawArrays(GL_POINTS, 9, 1);
         }
     }
+
 }

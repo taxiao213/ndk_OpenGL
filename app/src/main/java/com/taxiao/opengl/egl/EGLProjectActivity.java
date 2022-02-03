@@ -5,6 +5,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.opengl.GLSurfaceView;
 import android.os.Bundle;
+import android.view.MotionEvent;
+import android.view.View;
 
 import androidx.annotation.Nullable;
 
@@ -20,7 +22,7 @@ public class EGLProjectActivity extends Activity {
     public Context mContext;
     public boolean renderSet = false;
     private GLSurfaceView glSurfaceView;
-    private GLSurfaceView.Renderer renderer;
+    private IBaseRender renderer;
     private String TAG;
 
     @Override
@@ -30,6 +32,34 @@ public class EGLProjectActivity extends Activity {
         int action = intent.getIntExtra("action", 1);
         mContext = this;
         glSurfaceView = new GLSurfaceView(mContext);
+        glSurfaceView.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                if (event != null) {
+                    final float normalizedX = (event.getX() / (float) v.getWidth()) * 2 - 1;
+                    final float normalizedY = -((event.getY() / (float) v.getHeight()) * 2 - 1);
+                    if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                        glSurfaceView.queueEvent(new Runnable() {
+                            @Override
+                            public void run() {
+                                renderer.handleTouchPress(normalizedX, normalizedY);
+                            }
+                        });
+                    } else if (event.getAction() == MotionEvent.ACTION_MOVE) {
+                        glSurfaceView.queueEvent(new Runnable() {
+                            @Override
+                            public void run() {
+                                renderer.handleTouchDrag(normalizedX, normalizedY);
+                            }
+                        });
+                    }
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+        });
+
         setContentView(glSurfaceView);
         boolean enableEs2 = EGLUtils.getInstance(mContext).isEnableEs2();
         if (enableEs2) {
@@ -61,6 +91,9 @@ public class EGLProjectActivity extends Activity {
                     break;
                 case 9:
                     renderer = new ImageOpenGLRender2(mContext);
+                    break;
+                case 10:
+                    renderer = new ImageOpenGLRender3(mContext);
                     break;
                 default:
                     renderer = new FirstOpenGLRender(mContext);

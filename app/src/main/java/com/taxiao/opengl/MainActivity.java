@@ -46,6 +46,8 @@ public class MainActivity extends AppCompatActivity {
         Button button8 = findViewById(R.id.bt8);
         Button button9 = findViewById(R.id.bt9);
         Button button10 = findViewById(R.id.bt10);
+        Button button11 = findViewById(R.id.bt11);
+        Button button12 = findViewById(R.id.bt12);
         final JniSdkImpl jniSdk = new JniSdkImpl();
 //        surface.setJniSdkImpl(jniSdk);
 //        surface2.setJniSdkImpl(jniSdk);
@@ -96,7 +98,7 @@ public class MainActivity extends AppCompatActivity {
         button6.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // 棒球-三角形扇-混色
+                // 棒球-三角形扇-混色-正交投影
                 Intent intent = new Intent(MainActivity.this, EGLProjectActivity.class);
                 intent.putExtra("action", 4);
                 startActivity(intent);
@@ -106,7 +108,7 @@ public class MainActivity extends AppCompatActivity {
         button7.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // 棒球-三角形扇-混色
+                // 棒球-三角形扇-混色-正交投影-三维
                 Intent intent = new Intent(MainActivity.this, EGLProjectActivity.class);
                 intent.putExtra("action", 5);
                 startActivity(intent);
@@ -116,7 +118,7 @@ public class MainActivity extends AppCompatActivity {
         button8.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // 棒球-三角形扇-混色
+                // 棒球-三角形扇-混色-投影矩阵
                 Intent intent = new Intent(MainActivity.this, EGLProjectActivity.class);
                 intent.putExtra("action", 6);
                 startActivity(intent);
@@ -126,7 +128,7 @@ public class MainActivity extends AppCompatActivity {
         button9.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // 棒球-三角形扇-混色
+                // 棒球-三角形扇-混色-投影矩阵-旋转
                 Intent intent = new Intent(MainActivity.this, EGLProjectActivity.class);
                 intent.putExtra("action", 7);
                 startActivity(intent);
@@ -136,9 +138,29 @@ public class MainActivity extends AppCompatActivity {
         button10.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // 棒球-三角形扇-混色
+                // 图片纹理
                 Intent intent = new Intent(MainActivity.this, EGLProjectActivity.class);
                 intent.putExtra("action", 8);
+                startActivity(intent);
+            }
+        });
+
+        button11.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // 图片纹理2
+                Intent intent = new Intent(MainActivity.this, EGLProjectActivity.class);
+                intent.putExtra("action", 9);
+                startActivity(intent);
+            }
+        });
+
+        button12.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // 图片纹理2，增加手势互动
+                Intent intent = new Intent(MainActivity.this, EGLProjectActivity.class);
+                intent.putExtra("action", 10);
                 startActivity(intent);
             }
         });

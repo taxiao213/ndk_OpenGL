@@ -38,7 +38,7 @@ import static android.opengl.GLES20.glViewport;
  * CSDN:http://blog.csdn.net/yin13753884368/article
  * Github:https://github.com/taxiao213
  */
-public class FourthOpenGLRender implements GLSurfaceView.Renderer {
+public class FourthOpenGLRender extends BaseRenderImp {
     private String TAG = this.getClass().getSimpleName();
     // 坐标归一化 数据类型是x,y,r,g,b
     float[] tableVertices = {
@@ -150,4 +150,5 @@ public class FourthOpenGLRender implements GLSurfaceView.Renderer {
             glDrawArrays(GL_POINTS, 9, 1);
         }
     }
+
 }
