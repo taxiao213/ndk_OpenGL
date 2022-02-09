@@ -10,6 +10,7 @@ import android.view.View;
 
 import androidx.annotation.Nullable;
 
+import com.taxiao.opengl.egl.particle.ParticleRender;
 import com.taxiao.opengl.util.LogUtils;
 
 /**
@@ -94,6 +95,9 @@ public class EGLProjectActivity extends Activity {
                     break;
                 case 10:
                     renderer = new ImageOpenGLRender3(mContext);
+                    break;
+                case 11:
+                    renderer = new ParticleRender(mContext);
                     break;
                 default:
                     renderer = new FirstOpenGLRender(mContext);
