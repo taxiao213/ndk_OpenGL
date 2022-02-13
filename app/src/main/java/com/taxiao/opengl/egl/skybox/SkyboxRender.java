@@ -71,7 +71,7 @@ public class SkyboxRender extends BaseRenderImp {
         final float speedVariance = 1f;
 
         redParticleShooter = new ParticleShooter(
-                new Point(-1f, 0f, 0f),
+                new Point(-0.7f, 0f, 0f),
                 particleDirection,
                 Color.rgb(255, 50, 5),
                 angleVarianceInDegrees,
@@ -85,7 +85,7 @@ public class SkyboxRender extends BaseRenderImp {
                 speedVariance);
 
         blueParticleShooter = new ParticleShooter(
-                new Point(1f, 0f, 0f),
+                new Point(0.7f, 0f, 0f),
                 particleDirection,
                 Color.rgb(5, 50, 255),
                 angleVarianceInDegrees,
