@@ -48,6 +48,8 @@ public class MainActivity extends AppCompatActivity {
         Button button10 = findViewById(R.id.bt10);
         Button button11 = findViewById(R.id.bt11);
         Button button12 = findViewById(R.id.bt12);
+        Button button13 = findViewById(R.id.bt13);
+        Button button14 = findViewById(R.id.bt14);
         final JniSdkImpl jniSdk = new JniSdkImpl();
 //        surface.setJniSdkImpl(jniSdk);
 //        surface2.setJniSdkImpl(jniSdk);
@@ -161,6 +163,25 @@ public class MainActivity extends AppCompatActivity {
                 // 图片纹理2，增加手势互动
                 Intent intent = new Intent(MainActivity.this, EGLProjectActivity.class);
                 intent.putExtra("action", 10);
+                startActivity(intent);
+            }
+        });
+
+        button13.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // 图粒子系统
+                Intent intent = new Intent(MainActivity.this, EGLProjectActivity.class);
+                intent.putExtra("action", 11);
+                startActivity(intent);
+            }
+        });
+        button14.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // 粒子系统，增加天空盒
+                Intent intent = new Intent(MainActivity.this, EGLProjectActivity.class);
+                intent.putExtra("action", 12);
                 startActivity(intent);
             }
         });

@@ -11,6 +11,7 @@ import android.view.View;
 import androidx.annotation.Nullable;
 
 import com.taxiao.opengl.egl.particle.ParticleRender;
+import com.taxiao.opengl.egl.skybox.SkyboxRender;
 import com.taxiao.opengl.util.LogUtils;
 
 /**
@@ -25,34 +26,59 @@ public class EGLProjectActivity extends Activity {
     private GLSurfaceView glSurfaceView;
     private IBaseRender renderer;
     private String TAG;
+    private int action;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Intent intent = getIntent();
-        int action = intent.getIntExtra("action", 1);
+        action = intent.getIntExtra("action", 1);
         mContext = this;
         glSurfaceView = new GLSurfaceView(mContext);
         glSurfaceView.setOnTouchListener(new View.OnTouchListener() {
+            float previousX, previousY;
+
             @Override
             public boolean onTouch(View v, MotionEvent event) {
                 if (event != null) {
-                    final float normalizedX = (event.getX() / (float) v.getWidth()) * 2 - 1;
-                    final float normalizedY = -((event.getY() / (float) v.getHeight()) * 2 - 1);
-                    if (event.getAction() == MotionEvent.ACTION_DOWN) {
-                        glSurfaceView.queueEvent(new Runnable() {
-                            @Override
-                            public void run() {
-                                renderer.handleTouchPress(normalizedX, normalizedY);
-                            }
-                        });
-                    } else if (event.getAction() == MotionEvent.ACTION_MOVE) {
-                        glSurfaceView.queueEvent(new Runnable() {
-                            @Override
-                            public void run() {
-                                renderer.handleTouchDrag(normalizedX, normalizedY);
-                            }
-                        });
+                    if (action == 12) {
+                        // 天空盒子
+                        if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                            previousX = event.getX();
+                            previousY = event.getY();
+                        } else if (event.getAction() == MotionEvent.ACTION_MOVE) {
+                            final float deltaX = event.getX() - previousX;
+                            final float deltaY = event.getY() - previousY;
+
+                            previousX = event.getX();
+                            previousY = event.getY();
+
+                            glSurfaceView.queueEvent(new Runnable() {
+                                @Override
+                                public void run() {
+                                    renderer.handleTouchDrag(
+                                            deltaX, deltaY);
+                                }
+                            });
+                        }
+                    } else {
+                        final float normalizedX = (event.getX() / (float) v.getWidth()) * 2 - 1;
+                        final float normalizedY = -((event.getY() / (float) v.getHeight()) * 2 - 1);
+                        if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                            glSurfaceView.queueEvent(new Runnable() {
+                                @Override
+                                public void run() {
+                                    renderer.handleTouchPress(normalizedX, normalizedY);
+                                }
+                            });
+                        } else if (event.getAction() == MotionEvent.ACTION_MOVE) {
+                            glSurfaceView.queueEvent(new Runnable() {
+                                @Override
+                                public void run() {
+                                    renderer.handleTouchDrag(normalizedX, normalizedY);
+                                }
+                            });
+                        }
                     }
                     return true;
                 } else {
@@ -98,6 +124,9 @@ public class EGLProjectActivity extends Activity {
                     break;
                 case 11:
                     renderer = new ParticleRender(mContext);
+                    break;
+                case 12:
+                    renderer = new SkyboxRender(mContext);
                     break;
                 default:
                     renderer = new FirstOpenGLRender(mContext);
