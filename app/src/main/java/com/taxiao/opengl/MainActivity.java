@@ -50,6 +50,7 @@ public class MainActivity extends AppCompatActivity {
         Button button12 = findViewById(R.id.bt12);
         Button button13 = findViewById(R.id.bt13);
         Button button14 = findViewById(R.id.bt14);
+        Button button15 = findViewById(R.id.bt15);
         final JniSdkImpl jniSdk = new JniSdkImpl();
 //        surface.setJniSdkImpl(jniSdk);
 //        surface2.setJniSdkImpl(jniSdk);
@@ -182,6 +183,15 @@ public class MainActivity extends AppCompatActivity {
                 // 粒子系统，增加天空盒
                 Intent intent = new Intent(MainActivity.this, EGLProjectActivity.class);
                 intent.putExtra("action", 12);
+                startActivity(intent);
+            }
+        });
+        button15.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // 粒子系统，增加天空盒，绘制高度图
+                Intent intent = new Intent(MainActivity.this, EGLProjectActivity.class);
+                intent.putExtra("action", 13);
                 startActivity(intent);
             }
         });

@@ -21,7 +21,7 @@ public class SkyboxShaderProgram extends ShaderProgram4 {
     private final int uTextureUnitLocation;
     private final int aPositionLocation;
 
-    protected SkyboxShaderProgram(Context context) {
+    public SkyboxShaderProgram(Context context) {
         super(context, R.raw.vertex_skybox_shader, R.raw.fragment_skybox_shader);
         uMatrixLocation = glGetUniformLocation(program, U_MATRIX);
         uTextureUnitLocation = glGetUniformLocation(program, U_TEXTURE_UNIT);

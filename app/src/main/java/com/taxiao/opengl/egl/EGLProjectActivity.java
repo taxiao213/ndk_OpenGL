@@ -10,6 +10,7 @@ import android.view.View;
 
 import androidx.annotation.Nullable;
 
+import com.taxiao.opengl.egl.heightmap.HeightmapRender;
 import com.taxiao.opengl.egl.particle.ParticleRender;
 import com.taxiao.opengl.egl.skybox.SkyboxRender;
 import com.taxiao.opengl.util.LogUtils;
@@ -41,7 +42,7 @@ public class EGLProjectActivity extends Activity {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
                 if (event != null) {
-                    if (action == 12) {
+                    if (action == 12 || action == 13) {
                         // 天空盒子
                         if (event.getAction() == MotionEvent.ACTION_DOWN) {
                             previousX = event.getX();
@@ -127,6 +128,9 @@ public class EGLProjectActivity extends Activity {
                     break;
                 case 12:
                     renderer = new SkyboxRender(mContext);
+                    break;
+                case 13:
+                    renderer = new HeightmapRender(mContext);
                     break;
                 default:
                     renderer = new FirstOpenGLRender(mContext);
