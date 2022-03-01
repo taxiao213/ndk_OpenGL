@@ -198,7 +198,7 @@ public class HeightmapRender extends BaseRenderImp {
 
         // We want the translation to apply to the regular view matrix, and not
         // the skybox.
-        Matrix.translateM(viewMatrix, 0, 0, -1.5f, -15f);
+        Matrix.translateM(viewMatrix, 0, 0, -1.5f, -5f);
     }
 
     private void updateMvpMatrix() {

@@ -26,6 +26,10 @@ public class Vector {
         );
     }
 
+    public Vector normalize() {
+        return scale(1f / length());
+    }
+
     // 勾股定理返回向量的长度
     public float length() {
         return (float) Math.sqrt(x * x + y * y + z * z);

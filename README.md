@@ -10,7 +10,7 @@ project use opengl render surface
 
 
 
-![https://github.com/taxiao213/ndk_OpenGL/raw/main/source/source.gif](https://github.com/taxiao213/ndk_OpenGL/raw/main/source/source.gif)
+![https://github.com/taxiao213/ndk_OpenGL/raw/main/source/source2.gif](https://github.com/taxiao213/ndk_OpenGL/raw/main/source/source2.gif)
 
 
 

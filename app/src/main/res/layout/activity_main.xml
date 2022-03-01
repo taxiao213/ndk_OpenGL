@@ -177,7 +177,7 @@
             android:id="@+id/bt16"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text=" " />
+            android:text="粒子系统,天空盒,高度图，光照" />
 
         <Button
             android:id="@+id/bt17"
