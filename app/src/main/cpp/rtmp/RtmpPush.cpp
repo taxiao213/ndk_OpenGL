@@ -143,6 +143,7 @@ void RtmpPush::pushSPSPPS(char *sps, int sps_len, char *pps, int pps_len) {
 }
 
 void RtmpPush::pushVideoData(char *data, int data_len, bool keyframe) {
+    SDK_LOG_D("pushVideoData %d", rtmp->m_stream_id);
     RTMPPacket *rtmpPacket = static_cast<RTMPPacket *>(malloc(sizeof(RTMPPacket)));
     int bodysize = data_len + 9;
     RTMPPacket_Alloc(rtmpPacket, bodysize);
@@ -180,12 +181,58 @@ void RtmpPush::pushVideoData(char *data, int data_len, bool keyframe) {
 }
 
 void RtmpPush::pushAudioData(char *data, int data_len) {
-    SDK_LOG_D("pushAudioData");
+    SDK_LOG_D("pushAudioData %d", rtmp->m_stream_id);
     RTMPPacket *rtmpPacket = static_cast<RTMPPacket *>(malloc(sizeof(RTMPPacket)));
-    int bodysize = data_len + 2;
+    int bodysize = data_len +7;
     RTMPPacket_Alloc(rtmpPacket, bodysize);
     RTMPPacket_Reset(rtmpPacket);
     char *body = rtmpPacket->m_body;
+
+    int profile = 2; // AAC LC
+    int freqIdx = 4; // 44.1KHz
+    int chanCfg = 2; // CPE
+    int i=0;
+    // fill in ADTS data
+//    body[i++]=0xFF;// 11111111     = syncword
+//    body[i++]=0xF9; // 1111 1 00 1  = syncword MPEG-2 Layer CRC
+//    body[2] = (char)(((profile - 1) << 6) + (freqIdx << 2) + (chanCfg >> 2));
+//    body[6] = (char)0xFC;
+//    body[1] =   0xF9;
+//    body[2] =   (((profile - 1) << 6) + (freqIdx << 2) + (chanCfg >> 2));
+//    body[3] =   (((chanCfg & 3) << 6) + (bodysize >> 11));
+//    body[4] =   ((bodysize & 0x7FF) >> 3);
+//    body[5] =   (((bodysize & 7) << 5) + 0x1F);
+//    body[6] =   0xFC;
+
+
+    body[i++] = 0xff;                                    //syncword  (0xfff, high_8bits)
+    body[i] = 0xf0;                                      //syncword  (0xfff, low_4bits)
+    body[i] |= (0 << 3);                                 //ID (0, 1bit)
+    body[i] |= (0 << 1);                                 //layer (0, 2bits)
+    body[i]|= 1;                                        //protection_absent (1, 1bit)
+    i++;
+    body[i] = (unsigned char) ((profile & 0x3) << 6);  //profile (profile, 2bits)
+    body[i] |= ((freqIdx & 0xf) << 2);         //sampling_frequency_index (sam_idx, 4bits)
+    body[i] |= (0 << 1);                                 //private_bit (0, 1bit)
+    body[i] |= ((chanCfg & 0x4) >> 2);                 //channel_configuration (channel, high_1bit)
+    i++;
+    body[i] = ((chanCfg & 0x3) << 6);                  //channel_configuration (channel, low_2bits)
+    body[i] |= (0 << 5);                                 //original/copy (0, 1bit)
+    body[i] |= (0 << 4);                                 //home  (0, 1bit);
+    body[i]|= (0 << 3);                                 //copyright_identification_bit (0, 1bit)
+    body[i]|= (0 << 2);                                 //copyright_identification_start (0, 1bit)
+    body[i] |= ((bodysize & 0x1800) >> 11);             //frame_length (value, high_2bits)
+    i++;
+    body[i++] = (unsigned char) ((bodysize & 0x7f8) >> 3);  //frame_length (value, middle_8bits)
+    body[i] = (unsigned char) ((bodysize & 0x7) << 5);      //frame_length (value, low_3bits)
+    body[i] |= 0x1f;                                         //adts_buffer_fullness (0x7ff, high_5bits)
+    i++;
+    body[i] = 0xfc;                                          //adts_buffer_fullness (0x7ff, low_6bits)
+    body[i] |= 0;                                            //number_of_raw_data_blocks_in_frame (0, 2bits);
+    i++;
+
+
+
     //总共2字节：
     //
     //第一个字节表示AAC数据参数信息：
@@ -196,9 +243,11 @@ void RtmpPush::pushAudioData(char *data, int data_len) {
     //第二个字节：
     //0x00 aac头信息  
     //0x01 aac 原始数据
-    body[0] = 0xAF;
-    body[1] = 0x01;
-    memcpy(&body[2], data, data_len);
+//    body[i] = 0xAF;
+//    i++;
+//    body[i] = 0x01;
+//    i++;
+    memcpy(&body[i], data, data_len);
     rtmpPacket->m_packetType = RTMP_PACKET_TYPE_AUDIO;
     rtmpPacket->m_nBodySize = bodysize;
     rtmpPacket->m_nTimeStamp = RTMP_GetTime() - startTime;

@@ -1,9 +1,12 @@
 package com.taxiao.opengl.view.camera;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.SurfaceTexture;
 import android.opengl.GLES11Ext;
 import android.opengl.GLES20;
+import android.opengl.GLES30;
 import android.opengl.GLUtils;
 import android.opengl.Matrix;
 
@@ -13,6 +16,8 @@ import com.taxiao.opengl.util.LogUtils;
 import com.taxiao.opengl.util.ShaderUtils;
 import com.taxiao.opengl.util.egl.TXEglRender;
 import com.taxiao.opengl.view.TXFBORender;
+import com.taxiao.opengl.view.TXImageRender;
+import com.taxiao.opengl.view.TXMutiImageRender2;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -61,15 +66,15 @@ public class TXMutiCameraRender extends TXEglRender implements SurfaceTexture.On
     // * FBO离屏渲染的纹理坐标系以左下角为（0，0），左上角（0，1），右上角（1，1），右下角（1，0）
     // * 手机正常的纹理坐标系以左下角为（0，1），左上角（0，0），右上角（1，0），右下角（1，1）
     private final float[] textureData = {
-            0f, 1f,
-            1f, 1f,
-            0f, 0f,
-            1f, 0f
-
-//            0f, 0f,
-//            1f, 0f,
 //            0f, 1f,
-//            1f, 1f
+//            1f, 1f,
+//            0f, 0f,
+//            1f, 0f
+
+            0f, 0f,
+            1f, 0f,
+            0f, 1f,
+            1f, 1f
     };
 
     private Context mContext;
@@ -83,7 +88,9 @@ public class TXMutiCameraRender extends TXEglRender implements SurfaceTexture.On
     private int[] textureid;
     private int[] fbo;
     private int cameraTexure;
-    private final TXFBOCameraRender fboRender;
+    private TXFBOCameraRender fboRender;
+    private TXFBOCameraRender1 fboRender1;
+    private TXMutiImageRender2 fboRender2;
     private int u_matrix;
     private float[] mMatrix;
     private int mIndex = -1;
@@ -94,6 +101,7 @@ public class TXMutiCameraRender extends TXEglRender implements SurfaceTexture.On
     private int mViewHeight;
     private OnRenderCameraListener mOnRenderCameraListener;
     private SurfaceTexture cameraSurfaceTexture;
+    private int[] vao;
 
     public TXMutiCameraRender(Context context) {
         LogUtils.d(TAG, "TXMutiCameraRender create");
@@ -101,6 +109,8 @@ public class TXMutiCameraRender extends TXEglRender implements SurfaceTexture.On
         this.mWidth = DisplayUtil.getScreenWidth(context);
         this.mHeight = DisplayUtil.getScreenHeight(context);
         fboRender = new TXFBOCameraRender(context);
+        fboRender1 = new TXFBOCameraRender1(context);
+//        fboRender2 = new TXMutiImageRender2(context,1920,1080);
         mMatrix = new float[16];
         initMatrix();
         // 1.创建顶点 和 纹理 buffer
@@ -134,6 +144,12 @@ public class TXMutiCameraRender extends TXEglRender implements SurfaceTexture.On
         if (fboRender != null) {
             fboRender.onSurfaceCreated();
         }
+        if (fboRender1 != null) {
+            fboRender1.onSurfaceCreated();
+        }
+        if (fboRender2 != null) {
+            fboRender2.onSurfaceCreated();
+        }
         initOpenGLES();
     }
 
@@ -142,6 +158,13 @@ public class TXMutiCameraRender extends TXEglRender implements SurfaceTexture.On
         LogUtils.d(TAG, String.format("onSurfaceChanged width:%d height:%d ", width, height));
         if (fboRender != null) {
             fboRender.onSurfaceChanged(width, height);
+        }
+        if (fboRender1 != null) {
+            fboRender1.onSurfaceChanged(width, height);
+        }
+        if (fboRender2 != null) {
+            fboRender2.onSurfaceChanged(width, height);
+            fboRender2.setTextureId(textureid[0], 0);
         }
         mViewWidth = width;
         mViewHeight = height;
@@ -158,10 +181,24 @@ public class TXMutiCameraRender extends TXEglRender implements SurfaceTexture.On
     @Override
     public void onDrawFrame() {
         LogUtils.d(TAG, "onDrawFrame");
+        GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
+
         if (fboRender != null && textureid != null && textureid.length > 0) {
             // 传递的是纹理
-            fboRender.onSurfaceChanged(mViewWidth, mViewHeight);
-            fboRender.onDrawFrame(textureid[0]);
+//            fboRender.onSurfaceChanged(mViewWidth, mViewHeight);
+//            fboRender.onDrawFrame(textureid[0]);
+        }
+
+        if (fboRender1 != null && textureid != null && textureid.length > 0) {
+            // 传递的是纹理
+            fboRender1.onSurfaceChanged(mViewWidth, mViewHeight);
+            fboRender1.onDrawFrame(textureid[1]);
+
+        }
+
+        if (fboRender2 != null && textureid != null && textureid.length > 0) {
+//            fboRender2.onDrawFrame(program,textureid[0]);
+//            fboRender2.onDrawFrame();
         }
         renderFrame();
     }
@@ -181,6 +218,11 @@ public class TXMutiCameraRender extends TXEglRender implements SurfaceTexture.On
             s_texture = GLES20.glGetUniformLocation(program, "s_texture");
             u_matrix = GLES20.glGetUniformLocation(program, "u_Matrix");
 
+            // 创建VAO
+            vao = new int[1];
+            GLES30.glGenVertexArrays(1, vao, 0);
+            GLES30.glBindVertexArray(vao[0]);
+
             // 使用VBO
             // 4.1 创建VBO
             vbo = new int[1];
@@ -195,6 +237,8 @@ public class TXMutiCameraRender extends TXEglRender implements SurfaceTexture.On
             // 4.5 解绑
             GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, 0);
 
+            GLES30.glBindVertexArray(0);
+
             // 使用FBO
             // 4.6 创建FBO
             fbo = new int[1];
@@ -203,24 +247,29 @@ public class TXMutiCameraRender extends TXEglRender implements SurfaceTexture.On
 
             // 5.创建纹理
             if (textureid == null) {
-                textureid = new int[1];
+                textureid = new int[2];
             }
-            GLES20.glGenTextures(1, textureid, 0);
-            if (textureid[0] == 0) {
-                LogUtils.d(TAG, " textureid[0] == 0");
-                return;
-            }
-            // 6.绑定纹理
-            GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, textureid[0]);
-            GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
-            GLES20.glUniform1i(s_texture, 0);
+            GLES20.glGenTextures(2, textureid, 0);
+            for (int i = 0; i < 2; i++) {
+                // 6.绑定纹理
+                GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, textureid[i]);
+//                GLES20.glUniform1i(s_texture, 0);
 
-            // 7.设置环绕和过滤方式 环绕（超出纹理坐标范围）：（s==x t==y GL_REPEAT 重复）
-            GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_S, GLES20.GL_REPEAT);
-            GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_T, GLES20.GL_REPEAT);
-            // 8.过滤（纹理像素映射到坐标点）：（缩小、放大：GL_LINEAR线性）
-            GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_LINEAR);
-            GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MAG_FILTER, GLES20.GL_LINEAR);
+                // 7.设置环绕和过滤方式 环绕（超出纹理坐标范围）：（s==x t==y GL_REPEAT 重复）
+                GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_S, GLES20.GL_REPEAT);
+                GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_T, GLES20.GL_REPEAT);
+                // 8.过滤（纹理像素映射到坐标点）：（缩小、放大：GL_LINEAR线性）
+                GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_LINEAR);
+                GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MAG_FILTER, GLES20.GL_LINEAR);
+                GLES20.glTexImage2D(GLES20.GL_TEXTURE_2D, 0, GLES20.GL_RGBA, mWidth
+                        , mHeight, 0, GLES20.GL_RGBA, GLES20.GL_UNSIGNED_BYTE, null);
+                // 4.8 把纹理绑定到FBO
+                GLES20.glFramebufferTexture2D(GLES20.GL_FRAMEBUFFER, GLES20.GL_COLOR_ATTACHMENT0, GLES20.GL_TEXTURE_2D, textureid[i], 0);
+            }
+
+            // 解绑fbo
+            GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, 0);
+            GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, 0);
 
 
             // 参数1 匹配模式
@@ -233,22 +282,56 @@ public class TXMutiCameraRender extends TXEglRender implements SurfaceTexture.On
             // 参数8 无符号的byte
             // 参数9 传递的buffer,传null只分配内存
             // 4.7 设置FBO分配内存大小
-            GLES20.glTexImage2D(GLES20.GL_TEXTURE_2D, 0, GLES20.GL_RGBA, mWidth
-                    , mHeight, 0, GLES20.GL_RGBA, GLES20.GL_UNSIGNED_BYTE, null);
-            // 4.8 把纹理绑定到FBO
-            GLES20.glFramebufferTexture2D(GLES20.GL_FRAMEBUFFER, GLES20.GL_COLOR_ATTACHMENT0, GLES20.GL_TEXTURE_2D, textureid[0], 0);
+
             // 4.9 检查FBO绑定是否成功
             if (GLES20.glCheckFramebufferStatus(GLES20.GL_FRAMEBUFFER) != GLES20.GL_FRAMEBUFFER_COMPLETE) {
                 LogUtils.d(TAG, "fbo wrong");
             } else {
                 LogUtils.d(TAG, "fbo success");
             }
-            // 解绑fbo
-            GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, 0);
-            GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, 0);
+
 
             cameraTexure = loadTexture();
             LogUtils.d(TAG, "initOpenGLES end");
+
+//************************
+
+//            // 4.6 创建FBO
+//            fbo = new int[2];
+//            GLES20.glGenBuffers(2, fbo, 0);
+//            for (int i = 0; i < 2; i++) {
+//                GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, fbo[i]);
+//            }
+//
+//            // 5.创建纹理
+//            if (textureid == null) {
+//                textureid = new int[2];
+//            }
+//            GLES20.glGenTextures(2, textureid, 0);
+//
+//            for (int i = 0; i < 2; i++) {
+//                // 6.绑定纹理
+//                GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, textureid[i]);
+//                GLES20.glUniform1i(s_texture, i);
+//                // 7.设置环绕和过滤方式 环绕（超出纹理坐标范围）：（s==x t==y GL_REPEAT 重复）
+//                GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_S, GLES20.GL_REPEAT);
+//                GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_T, GLES20.GL_REPEAT);
+//                // 8.过滤（纹理像素映射到坐标点）：（缩小、放大：GL_LINEAR线性）
+//                GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_LINEAR);
+//                GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MAG_FILTER, GLES20.GL_LINEAR);
+//
+//                GLES20.glTexImage2D(GLES20.GL_TEXTURE_2D, 0, GLES20.GL_RGBA, mWidth
+//                        , mHeight, 0, GLES20.GL_RGBA, GLES20.GL_UNSIGNED_BYTE, null);
+//                // 4.8 把纹理绑定到FBO
+//                GLES20.glFramebufferTexture2D(GLES20.GL_FRAMEBUFFER, GLES20.GL_COLOR_ATTACHMENT0, GLES20.GL_TEXTURE_2D, textureid[i], 0);
+//
+//                // 解绑fbo
+//                GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, i);
+//                GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, 0);
+//            }
+//
+//            cameraTexure = loadTexture();
+//            LogUtils.d(TAG, "initOpenGLES end");
         }
     }
 
@@ -259,29 +342,35 @@ public class TXMutiCameraRender extends TXEglRender implements SurfaceTexture.On
             GLES20.glViewport(0, 0, mWidth, mHeight);
             // 10.使用渲染器
             GLES20.glUseProgram(program);
+            GLES30.glBindVertexArray(vao[0]);
             GLES20.glUniformMatrix4fv(u_matrix, 1, false, mMatrix, 0);
-            // 10.1绑定
-            GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, fbo[0]);
-            GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, vbo[0]);
 
-            // 10.2绑定图片的纹理
-            GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, cameraTexure);
+            for (int i = 0; i < 1; i++) {
+                // 10.1绑定
+                GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, fbo[i]);
+                GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, vbo[0]);
 
-            // 11.使顶点坐标和纹理坐标属性数组有效
-            GLES20.glEnableVertexAttribArray(av_position);
-            // 使用VBO 缓存时最后一个参数传0，不使用VBO ,最后一个参数传vertexBuffer
-            GLES20.glVertexAttribPointer(av_position, 2, GLES20.GL_FLOAT, false, 8, 0);
+                // 10.2绑定图片的纹理
+                GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, cameraTexure);
 
-            GLES20.glEnableVertexAttribArray(af_position);
-            // 设置VBO 缓存时最后一个参数传入顶点坐标buffer的内存大小，偏移量
-            GLES20.glVertexAttribPointer(af_position, 2, GLES20.GL_FLOAT, false, 8, vertexData.length * 4);
-            // 12.绘制
-            GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, 4);
+                // 11.使顶点坐标和纹理坐标属性数组有效
+                GLES20.glEnableVertexAttribArray(av_position);
+                // 使用VBO 缓存时最后一个参数传0，不使用VBO ,最后一个参数传vertexBuffer
+                GLES20.glVertexAttribPointer(av_position, 2, GLES20.GL_FLOAT, false, 8, 0);
 
-            // 13.解绑
-            GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, 0);
-            GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, 0);
-            GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, 0);
+                GLES20.glEnableVertexAttribArray(af_position);
+                // 设置VBO 缓存时最后一个参数传入顶点坐标buffer的内存大小，偏移量
+                GLES20.glVertexAttribPointer(af_position, 2, GLES20.GL_FLOAT, false, 8, vertexData.length * 4);
+                // 12.绘制
+                GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, 4);
+
+                // 13.解绑
+                GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, 0);
+                GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, 0);
+                GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, 0);
+            }
+
+            GLES30.glBindVertexArray(0);
         }
     }
 

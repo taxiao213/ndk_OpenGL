@@ -3,21 +3,16 @@ package com.taxiao.opengl;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.TextView;
 
 import com.taxiao.opengl.egl.EGLProjectActivity;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.InputStream;
-import java.nio.ByteBuffer;
 import java.util.concurrent.Executors;
 
 /**
@@ -52,6 +47,7 @@ public class MainActivity extends AppCompatActivity {
         Button button14 = findViewById(R.id.bt14);
         Button button15 = findViewById(R.id.bt15);
         Button button16 = findViewById(R.id.bt16);
+        Button button17 = findViewById(R.id.bt17);
         final JniSdkImpl jniSdk = new JniSdkImpl();
 //        surface.setJniSdkImpl(jniSdk);
 //        surface2.setJniSdkImpl(jniSdk);
@@ -203,6 +199,12 @@ public class MainActivity extends AppCompatActivity {
                 Intent intent = new Intent(MainActivity.this, EGLProjectActivity.class);
                 intent.putExtra("action", 14);
                 startActivity(intent);
+            }
+        });
+        button17.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
             }
         });
         surface3.setJniSdkImpl(jniSdk, new TXSurfaceView3.ISurfaceInterface() {

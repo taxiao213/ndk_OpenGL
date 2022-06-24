@@ -2,6 +2,7 @@ package com.taxiao.opengl.view.camera;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.opengl.GLES20;
 
 import com.taxiao.opengl.R;
@@ -55,7 +56,7 @@ public class TXFBOCameraRender {
 
     public TXFBOCameraRender(Context context) {
         this.mContext = context;
-        bitmap = ShaderUtils.createTextImage("视频录制：他晓", 50, "#ff0000", "#00000000", 10);
+        bitmap = ShaderUtils.createTextImage("视频录制", 50, "#ff0000", "#00000000", 10);
 
         float r = 1.0f * bitmap.getWidth() / bitmap.getHeight();
         float w = r * 0.1f;
@@ -99,12 +100,16 @@ public class TXFBOCameraRender {
     public void onDrawFrame(int imageTexure) {
         LogUtils.d(TAG, "onDrawFrame");
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
-        GLES20.glClearColor(0f, 0f, 1f, 0f);
+        GLES20.glClearColor(1f, 0f, 0f, 0f);
         renderFrame(imageTexure);
     }
 
     private void initOpenGLES() {
         LogUtils.d(TAG, "initOpenGLES");
+        // 去掉背景
+        GLES20.glEnable(GLES20.GL_BLEND);
+        GLES20.glBlendFunc(GLES20.GL_SRC_ALPHA,GLES20.GL_ONE_MINUS_SRC_ALPHA);
+
         // 2.加载 shader
         String vertex = ShaderUtils.readRawTxt(mContext, R.raw.vertex_image_shader);
         String texture = ShaderUtils.readRawTxt(mContext, R.raw.fragment_image_shader);
@@ -128,7 +133,6 @@ public class TXFBOCameraRender {
             GLES20.glBufferSubData(GLES20.GL_ARRAY_BUFFER, vertexData.length * 4, textureData.length * 4, textureBuffer);
             // 4.5 解绑
             GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, 0);
-
 
             bitmapTexture = ShaderUtils.loadBitmapTexture(bitmap);
         }

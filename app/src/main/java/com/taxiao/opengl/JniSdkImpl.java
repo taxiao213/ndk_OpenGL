@@ -1,5 +1,6 @@
 package com.taxiao.opengl;
 
+import android.content.res.AssetManager;
 import android.view.Surface;
 
 import com.taxiao.opengl.rtmp.TXConnectListenr;
@@ -103,4 +104,10 @@ public class JniSdkImpl {
     private native void pushAudioData(byte[] data, int data_len);
 
     public native void stopPush();
+
+    public native void initAsserts(AssetManager assertManager);
+
+    public native void freeSurfaceCreated(Surface surface);
+
+    public native void freeSurfaceChanged(int width, int height);
 }

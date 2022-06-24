@@ -34,6 +34,7 @@ void *eglThreadImpl(void *data) {
                     txEglThread->isCreate = false;
                     // TODO: 回调到外层调用
                     txEglThread->onSurfaceCreated(txEglThread->onSurfaceCreatedCtx);
+                    txEglThread->isStart = true;
                 }
                 if (txEglThread->isChange) {
                     SDK_LOG_D("eglThreadImpl call surfaceChanged");
@@ -43,7 +44,6 @@ void *eglThreadImpl(void *data) {
                     txEglThread->onSurfaceChanged(txEglThread->surfaceWidth,
                                                   txEglThread->surfaceHeight,
                                                   txEglThread->onSurfaceChangedCtx);
-                    txEglThread->isStart = true;
                 }
                 if (txEglThread->isChangeFilter) {
                     SDK_LOG_D("eglThreadImpl call onSurfaceChangedFilter");
@@ -80,8 +80,9 @@ void *eglThreadImpl(void *data) {
             }
         }
     }
-//    pthread_exit(&txEglThread->mEglPthread);
-    return 0;
+    if (txEglThread != NULL) {
+        pthread_exit(&txEglThread->mEglPthread);
+    }
 }
 
 void TXEglThread::surfaceCreated(EGLNativeWindowType nativeWindow) {
@@ -119,7 +120,8 @@ void TXEglThread::surfaceChangedFilter() {
 void TXEglThread::surfaceDestroy() {
     isExit = true;
     notifyThread();
-    pthread_join(mEglPthread, NULL);
+//    pthread_join(mEglPthread, NULL);
+    ANativeWindow_release(mANativeWindow);
     mANativeWindow = NULL;
     mEglPthread = -1;
 }

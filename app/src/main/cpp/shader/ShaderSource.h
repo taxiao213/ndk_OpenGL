@@ -179,4 +179,28 @@ static float textureMatrixData3[] = {
         1, 0
 };
 
+
+static const char *vShaderStr = "#version 300 es\n"
+                                        "layout(location = 0) in vec4 a_position;// <vec2 pos, vec2 tex>\n"
+                                        "uniform mat4 u_MVPMatrix;\n"
+                                        "out vec2 v_texCoord;\n"
+                                        "void main()\n"
+                                        "{\n"
+                                        "    gl_Position = u_MVPMatrix * vec4(a_position.xy, 0.0, 1.0);;\n"
+                                        "    v_texCoord = a_position.zw;\n"
+                                        "}";
+
+static const char *fShaderStr = "#version 300 es\n"
+                                "precision mediump float;\n"
+                                "in vec2 v_texCoord;\n"
+                                "layout(location = 0) out vec4 outColor;\n"
+                                "uniform sampler2D s_textTexture;\n"
+                                "uniform vec3 u_textColor;\n"
+                                "\n"
+                                "void main()\n"
+                                "{\n"
+                                "    vec4 color = vec4(1.0, 1.0, 1.0, texture(s_textTexture, v_texCoord).r);\n"
+                                "    outColor = vec4(u_textColor, 1.0) * color;\n"
+                                "}";
+
 #endif //OPENGL_SHADERSOURCE_H

@@ -39,7 +39,7 @@ public class TXMutiGLSurfaceCamera extends TXEglSurfaceView {
         setRenderMode(Constant.RENDERMODE_CONTINUOUSLY);
         txEglRender = new TXMutiCameraRender(getContext());
         setRender(txEglRender);
-        previewAngle(getContext());
+//        previewAngle(getContext());
     }
 
     public void setOnCreate(OnRenderCameraListener onRenderCreateListener) {

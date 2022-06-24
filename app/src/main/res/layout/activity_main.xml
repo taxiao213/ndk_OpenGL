@@ -179,12 +179,21 @@
             android:layout_height="wrap_content"
             android:text="粒子系统,天空盒,高度图，光照" />
 
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:orientation="horizontal">
+
         <Button
             android:id="@+id/bt17"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="" />
+            android:text="decode" />
 
 
     </LinearLayout>
+
 </LinearLayout>

@@ -11,7 +11,7 @@
 #define OPENGL_ANDROID_LOG_H
 #endif //OPENGL_ANDROID_LOG_H
 
-#define TAG "TAXIAO"
+#define TAG "TA_XIAO"
 #define DEBUG 1
 
 #if DEBUG

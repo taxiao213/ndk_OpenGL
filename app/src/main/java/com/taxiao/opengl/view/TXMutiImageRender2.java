@@ -58,6 +58,11 @@ public class TXMutiImageRender2 extends TXEglRender {
             0.5f, -0.5f,
             -0.5f, 0.5f,
             0.5f, 0.5f
+
+            -0.2f, -0.2f,
+            0.2f, -0.2f,
+            -0.2f, 0.2f,
+            0.2f, 0.2f
     };
 
     // TODO 纹理坐标 FBO 离屏绘制和手机正常坐标不同
@@ -87,6 +92,7 @@ public class TXMutiImageRender2 extends TXEglRender {
     private int[] fbo;
     private int imageTexure;
     private int imageTexure2;
+    private int imageTexure3;
     private final TXFBORender fboRender;
     private int u_matrix;
     private float[] mMatrix;
@@ -253,6 +259,7 @@ public class TXMutiImageRender2 extends TXEglRender {
 
             imageTexure = loadTexture(R.mipmap.ic_launcher);
             imageTexure2 = loadTexture(R.mipmap.image_01);
+            imageTexure3 = loadTexture(R.mipmap.img_222);
 
             if (mOnRenderCreateListener != null) {
                 mOnRenderCreateListener.onCreate(textureid[0]);
